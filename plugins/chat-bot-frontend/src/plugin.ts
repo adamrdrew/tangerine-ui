@@ -16,7 +16,7 @@ export const ChatBotFrontendPage = chatBotFrontendPlugin.provide(
   createRoutableExtension({
     name: 'ChatBotFrontendPage',
     component: () =>
-      import('./components/ExampleComponent').then(m => m.ExampleComponent),
+      import('./components/ChatBotComponent').then(m => m.ChatBotComponent),
     mountPoint: rootRouteRef,
   }),
 );
