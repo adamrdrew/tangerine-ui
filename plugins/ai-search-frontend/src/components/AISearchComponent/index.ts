@@ -1,0 +1,1 @@
+export { AISearchComponent } from './AISearchComponent';
