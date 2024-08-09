@@ -5,18 +5,18 @@ import {
 
 import { rootRouteRef } from './routes';
 
-export const chatBotFrontendPlugin = createPlugin({
-  id: 'chat-bot-frontend',
+export const aiSearchFrontendPlugin = createPlugin({
+  id: 'ai-search-frontend',
   routes: {
     root: rootRouteRef,
   },
 });
 
-export const ChatBotFrontendPage = chatBotFrontendPlugin.provide(
+export const AISearchFrontendPage = aiSearchFrontendPlugin.provide(
   createRoutableExtension({
-    name: 'ChatBotFrontendPage',
+    name: 'AISearchFrontendPage',
     component: () =>
-      import('./components/ChatBotComponent').then(m => m.ChatBotComponent),
+      import('./components/AISearchComponent').then(m => m.AISearchComponent),
     mountPoint: rootRouteRef,
   }),
 );

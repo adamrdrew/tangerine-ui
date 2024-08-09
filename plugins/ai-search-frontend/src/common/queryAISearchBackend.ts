@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApi, configApiRef } from '@backstage/core-plugin-api';
 
-export const QueryChatBot = (agentId: number, userQuery: any) => {
+export const QueryAISearch = (agentId: number, userQuery: any) => {
     const [result, setResult] = useState<string>("");
     const [loaded, setLoaded] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
@@ -10,7 +10,7 @@ export const QueryChatBot = (agentId: number, userQuery: any) => {
     const config = useApi(configApiRef);
     const backendUrl = config.getString('backend.baseUrl'); 
 
-    const getChatBotResponse = async(agentId: number, userQuery: any) => {
+    const getAISearchResponse = async(agentId: number, userQuery: any) => {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -32,7 +32,7 @@ export const QueryChatBot = (agentId: number, userQuery: any) => {
     }
 
     useEffect(() => {
-        getChatBotResponse(agentId, userQuery)
+        getAISearchResponse(agentId, userQuery)
     }, [userQuery]);
 
     console.log(result)

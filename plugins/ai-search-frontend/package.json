@@ -1,5 +1,5 @@
 {
-  "name": "@internal/backstage-plugin-chat-bot-frontend",
+  "name": "@internal/backstage-plugin-ai-search-frontend",
   "version": "0.1.0",
   "main": "src/index.ts",
   "types": "src/index.ts",

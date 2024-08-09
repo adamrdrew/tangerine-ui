@@ -17,7 +17,7 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import { AgentColumn } from '../AgentsColumn';
-import { QueryChatBot } from '../../common/queryChatBotBackend';
+import { QueryAISearch } from '../../common/queryAISearchBackend';
 import { GetAgents } from '../../common/getAllAgents';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -28,7 +28,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 
-export const ChatBotComponent = () => {
+export const AISearchComponent = () => {
   const title: string = "🍊 Tangerine"
 
   const [newestUserQuery, setNewestUserQuery] = useState("");
@@ -94,7 +94,7 @@ export const ChatBotComponent = () => {
     }
   }
 
-  const { result: botReponseResult, loaded: botReponseLoaded, error: botResponseError } = QueryChatBot(agentId, newestUserQuery);
+  const { result: botReponseResult, loaded: botReponseLoaded, error: botResponseError } = QueryAISearch(agentId, newestUserQuery);
 
   useEffect(() => {
     console.log(botReponseResult)

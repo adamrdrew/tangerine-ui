@@ -36,7 +36,7 @@ import { AppRouter, FlatRoutes } from '@backstage/core-app-api';
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
-import { ChatBotFrontendPage } from '@internal/backstage-plugin-chat-bot-frontend';
+import { AISearchFrontendPage } from '@internal/backstage-plugin-ai-search-frontend';
 
 const app = createApp({
   apis,
@@ -96,7 +96,7 @@ const routes = (
     </Route>
     <Route path="/settings" element={<UserSettingsPage />} />
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
-    <Route path="/chat-bot-frontend" element={<ChatBotFrontendPage />} />
+    <Route path="/ai-search-frontend" element={<AISearchFrontendPage />} />
   </FlatRoutes>
 );
 

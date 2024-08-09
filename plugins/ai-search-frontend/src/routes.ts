@@ -1,5 +1,5 @@
 import { createRouteRef } from '@backstage/core-plugin-api';
 
 export const rootRouteRef = createRouteRef({
-  id: 'chat-bot-frontend',
+  id: 'ai-search-frontend',
 });
