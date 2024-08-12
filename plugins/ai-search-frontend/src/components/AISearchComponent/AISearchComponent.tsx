@@ -13,20 +13,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import { styled } from '@mui/material/styles';
-import { AgentColumn } from '../AgentsColumn';
 import { QueryAISearch } from '../../common/queryAISearchBackend';
 import { GetAgents } from '../../common/getAllAgents';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Slide from '@mui/material/Slide';
-import { TransitionProps } from '@mui/material/transitions';
 
 export const AISearchComponent = () => {
   const title: string = "🍊 Tangerine"
@@ -38,13 +27,6 @@ export const AISearchComponent = () => {
   const [agentId, setAgentId] = useState(1);
 
   const { result: agentsResult, loaded: agentsLoaded, error: agentsError } = GetAgents();
-
-  useEffect(() => {
-    if (agentsResult.agent_name) {
-      setAgent(agentsResult.agent_name)
-      setAgentId(agentsResult.id)
-    }
-  }, [agentsLoaded])
 
   const useStyles = makeStyles(theme => ({
     root: {
