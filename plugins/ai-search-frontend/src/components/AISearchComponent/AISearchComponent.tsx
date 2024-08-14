@@ -17,6 +17,14 @@ import Stack from '@mui/material/Stack';
 import { QueryAISearch } from '../../common/queryAISearchBackend';
 import { GetAgents } from '../../common/getAllAgents';
 
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
+import { MuiMarkdown } from 'mui-markdown';
+import Markdown from "react-markdown";
+
+
 export const AISearchComponent = () => {
   const title: string = "🍊 Tangerine"
 
@@ -51,7 +59,11 @@ export const AISearchComponent = () => {
           ...chatConversation,
           {
             name: "Human",
-            comment: e.target.value,
+            comment: {
+              value: {
+                text_content: e.target.value,
+              }
+            }
           }
         ]
       )
@@ -64,7 +76,12 @@ export const AISearchComponent = () => {
           ...chatConversation,
           {
             name: "AI Assistant",
-            comment: botResponse,
+            comment: {
+              value: {
+                text_content: botResponse.text_content,
+                search_metadata: botResponse.search_metadata,
+              }
+            }
           }
         ]
       )
@@ -86,11 +103,10 @@ export const AISearchComponent = () => {
   const DisplayChatInteraction = () => {
     setNewestUserQuery("")
 
+    // Had some issues breaking this into JSX partials. Will attempt again in the future.
     return (
         <Box
           height='100vh'
-          my={4}
-          display="flex"
           gap={4}
           p={2}
           sx={{ border: '2px' }}
@@ -100,7 +116,34 @@ export const AISearchComponent = () => {
             {chatConversation.map(element => (
               <div className={classes.root}>
                 <Typography><b>{element.name}</b></Typography>
-                <Typography>{element.comment}</Typography>
+                <Typography>{element.comment.value.text_content}</Typography>
+                { element.name === "AI Assistant"
+                ? <Accordion elevation={0}>
+                    <AccordionSummary
+                      aria-controls="panel1-content"
+                      id="panel1-header"
+                    >
+                      Show search data
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      {element?.comment?.value?.search_metadata?.map(content => (
+                        <Accordion elevation={0}>
+                          <AccordionSummary
+                            aria-controls="panel1-content"
+                            id="panel1-header"
+                          >
+                            <Typography>{content.metadata.filename}</Typography>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <Box sx={{ maxWidth: '100%' }}>
+                              <Markdown>{content.page_content}</Markdown>
+                            </Box>
+                          </AccordionDetails>
+                        </Accordion>
+                      ))} 
+                    </AccordionDetails>
+                  </Accordion>
+                : <div />}
               </div>
             ))}
           </Stack>
@@ -110,7 +153,7 @@ export const AISearchComponent = () => {
 
   useEffect(() => {
     console.log(botReponseResult)
-    addBotResponseToConversation(botReponseResult.text_content)
+    addBotResponseToConversation(botReponseResult)
   }, [botReponseResult])
 
   const getAgentId = (agentName: string) => {
@@ -129,7 +172,6 @@ export const AISearchComponent = () => {
           onChange={e => {
             setAgent(e.target.value as string)
             setAgentId(getAgentId(e.target.value))
-            // console.log(agentId)
           }}
         >
           {agentsResult.map((agent) => (
@@ -157,7 +199,6 @@ export const AISearchComponent = () => {
     const color = window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "white" : "black"
 
     return (
-      <Box sx={{ maxWidth: '100%' }}>
         <TextField
           label="Ask a question"
           id="userQuery"
@@ -169,7 +210,6 @@ export const AISearchComponent = () => {
             }
           }}
         />
-      </Box>
     )
   }
 
