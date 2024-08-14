@@ -240,11 +240,11 @@ export const AISearchComponent = () => {
   return (
     <InfoCard title={ <InfoCardTitle />}>
       <Grid container spacing={12}>
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+        <Grid item xs={12} sm={12}>
           <QueryTextField />
         </Grid>
       </Grid>
-      <Stack spacing={4}>
+      <Stack spacing={2}>
         <DisplayChatInteraction/>
       </Stack>
     </InfoCard>
