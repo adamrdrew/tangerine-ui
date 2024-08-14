@@ -36,7 +36,7 @@ import { AppRouter, FlatRoutes } from '@backstage/core-app-api';
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
-import { AISearchFrontendPage } from '@internal/backstage-plugin-ai-search-frontend';
+import { AISearchFrontendPage } from '@redhatinsights/backstage-plugin-ai-search-frontend';
 
 const app = createApp({
   apis,

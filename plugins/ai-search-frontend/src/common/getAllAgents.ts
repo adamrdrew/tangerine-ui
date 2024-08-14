@@ -31,7 +31,5 @@ export const GetAgents = () => {
         getAllAgents()
     }, []);
 
-    console.log(result)
-
     return { result, loaded, error }
 }

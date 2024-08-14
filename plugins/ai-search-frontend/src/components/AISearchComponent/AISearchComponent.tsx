@@ -21,7 +21,6 @@ export const AISearchComponent = () => {
   const title: string = "🍊 Tangerine"
 
   const [newestUserQuery, setNewestUserQuery] = useState("");
-  const [newestBotResponse, setNewestBotResponse] = useState("");
   const [chatConversation, setChatConversation] = useState([]);
   const [agent, setAgent] = useState("");
   const [agentId, setAgentId] = useState(1);
@@ -33,6 +32,14 @@ export const AISearchComponent = () => {
       marginBottom: theme.spacing(2),
     },
   }));
+
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    const textFieldColor = makeStyles(theme => ({
+      root: {
+        marginBottom: theme.spacing(2),
+      },
+    }))
+}
 
   const classes = useStyles();
 
@@ -52,8 +59,6 @@ export const AISearchComponent = () => {
 
   const addBotResponseToConversation = (botResponse: any) => {
     if (botResponse) {
-      setNewestBotResponse(botResponse)
-
       setChatConversation(
         [
           ...chatConversation,
@@ -78,16 +83,12 @@ export const AISearchComponent = () => {
 
   const { result: botReponseResult, loaded: botReponseLoaded, error: botResponseError } = QueryAISearch(agentId, newestUserQuery);
 
-  useEffect(() => {
-    console.log(botReponseResult)
-    addBotResponseToConversation(botReponseResult.text_content)
-  }, [botReponseResult])
-
-
   const DisplayChatInteraction = () => {
+    setNewestUserQuery("")
+
     return (
         <Box
-          height={550}
+          height='100vh'
           my={4}
           display="flex"
           gap={4}
@@ -106,6 +107,11 @@ export const AISearchComponent = () => {
         </Box>
     )
   }
+
+  useEffect(() => {
+    console.log(botReponseResult)
+    addBotResponseToConversation(botReponseResult.text_content)
+  }, [botReponseResult])
 
   const getAgentId = (agentName: string) => {
     console.log(agentsResult)
@@ -148,6 +154,8 @@ export const AISearchComponent = () => {
   };
 
   const QueryTextField = () => {
+    const color = window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "white" : "black"
+
     return (
       <Box sx={{ maxWidth: '100%' }}>
         <TextField
@@ -155,20 +163,15 @@ export const AISearchComponent = () => {
           id="userQuery"
           onKeyDown={(e) => keyPress(e)}
           fullWidth
+          sx={{
+            input: {
+              color: color,
+            }
+          }}
         />
       </Box>
     )
   }
-
-  const [open, setOpen] = React.useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   useEffect(() => {
     
@@ -193,6 +196,7 @@ export const AISearchComponent = () => {
       </InfoCard>
     );
   }
+  
   return (
     <InfoCard title={ <InfoCardTitle />}>
       <Grid container spacing={2}>
