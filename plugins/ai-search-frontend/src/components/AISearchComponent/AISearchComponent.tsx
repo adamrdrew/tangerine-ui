@@ -239,8 +239,8 @@ export const AISearchComponent = () => {
   
   return (
     <InfoCard title={ <InfoCardTitle />}>
-      <Grid container spacing={12}>
-        <Grid item xs={12} sm={12}>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
           <QueryTextField />
         </Grid>
       </Grid>
