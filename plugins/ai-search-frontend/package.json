@@ -33,6 +33,7 @@
     "@material-ui/lab": "4.0.0-alpha.61",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
+    "@patternfly/virtual-assistant": "1.0.0-prerelease.9",
     "mui-markdown": "^1.2.1",
     "react-markdown": "^9.0.1",
     "react-use": "^17.2.4"
