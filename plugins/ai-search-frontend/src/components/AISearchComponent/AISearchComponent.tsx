@@ -48,7 +48,7 @@ export const AISearchComponent = () => {
     modifyPFCardStyle();
     return () => {
       removeCustomStyles();
-    }
+    };
   }, []);
 
   // Whenever the conversation changes,
@@ -102,14 +102,20 @@ export const AISearchComponent = () => {
       width: 100% !important;
       border-radius: 0 !important;
       overflow: hidden !important; /* Prevents overflow if content grows */
-      box-sizing: border-box; /* Includes padding and border in height calculation */
-      display: flex; /* Flexbox to manage layout within the parent */
+      box-sizing: border-box; !important;/* Includes padding and border in height calculation */
+      display: flex; !important;/* Flexbox to manage layout within the parent */
     }
   
     [class*="cardBody-"] {
       max-height: 100% !important;
       height: 30px !important; /*This is black magic. It forces a correct height even though it looks wrong */
-      box-sizing: border-box; /* Includes padding and border in height calculation */
+      box-sizing: border-box; !important;/* Includes padding and border in height calculation */
+    }
+
+    .cardThemeBody {
+      max-height: 100% !important;
+      height: 100% !important; 
+      box-sizing: border-box; !important;/* Includes padding and border in height calculation */
     }
   `;
     // Append the style element to the document head
@@ -121,7 +127,7 @@ export const AISearchComponent = () => {
     if (style) {
       style.remove();
     }
-  }
+  };
 
   const sendUserQuery = async (agentId: number, userQuery: any) => {
     setLoading(true);
@@ -242,11 +248,12 @@ export const AISearchComponent = () => {
   return (
     <Page>
       <PageSection
+        padding={{ default: 'noPadding' }}
         variant={
           isDarkMode ? PageSectionVariants.darker : PageSectionVariants.light
         }
       >
-        <div class={isDarkMode ? 'pf-v5-theme-dark card-0-3-1' : 'card-0-3-1'}>
+        <div class={isDarkMode ? 'pf-v5-theme-dark cardThemeBody' : 'cardThemeBody'}>
           <VirtualAssistant
             title="inScope AI Search"
             inputPlaceholder="Ask a question"
