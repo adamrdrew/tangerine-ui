@@ -10,9 +10,10 @@ import UserMessageEntry from '@patternfly/virtual-assistant/dist/dynamic/UserMes
 import LoadingMessage from '@patternfly/virtual-assistant/dist/esm/LoadingMessage';
 import SystemMessageEntry from '@patternfly/virtual-assistant/dist/esm/SystemMessageEntry';
 import VirtualAssistantAction from '@patternfly/virtual-assistant/dist/dynamic/VirtualAssistantAction';
-import { AngleDownIcon, TrashIcon } from '@patternfly/react-icons';
+import {  TrashIcon } from '@patternfly/react-icons';
 
-import { Button } from '@patternfly/react-core';
+import { Page, PageSection, PageSectionVariants } from '@patternfly/react-core';
+
 
 import '@patternfly/react-core/dist/styles/base.css';
 import '@patternfly/react-styles';
@@ -33,10 +34,8 @@ import {
   FormSelectOption,
   HelperText,
   HelperTextItem,
-  ValidatedOptions
+  ValidatedOptions,
 } from '@patternfly/react-core';
-
-
 
 export const AISearchComponent = () => {
   // Constants
@@ -70,10 +69,32 @@ export const AISearchComponent = () => {
         setError(true);
         console.error(`Error fetching agents from backend`);
       });
-  }
+  };
+
+  const modifyPFCardStyle = () => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .card-0-3-1 {
+        height: 100% !important;
+        max-height: 100% !important; /* Ensures the element doesn't grow beyond the parent's height */
+        width: 100% !important;
+        border-radius: 0 !important;
+        overflow: hidden !important; /* Prevents overflow if content grows */
+        box-sizing: border-box; /* Includes padding and border in height calculation */
+        display: flex; /* Flexbox to manage layout within the parent */
+      }
+
+      .cardBody-0-3-6 {
+        max-height: 100% !important;
+      }
+    `;
+    // Append the style element to the document head
+    document.head.appendChild(style);
+  };
 
   useEffect(() => {
     getAgents();
+    modifyPFCardStyle();
   }, []);
   useEffect(() => {
     // If the last message in the conversation is from the user and the bot is not typing, send the user query
@@ -97,13 +118,10 @@ export const AISearchComponent = () => {
 
     return (
       <Form>
-        <FormGroup
-          label="Select Agent"
-          fieldId="select-agent"
-        >
+        <FormGroup label="Select an agent to chat with" fieldId="select-agent">
           <FormSelect
             id="select-agent"
-            aria-label="Select Agent"
+            aria-label="Select an agent to chat with."
             value={selectedAgent.id}
             onChange={(_event, selection) => {
               const agent = getAgentById(selection);
@@ -111,17 +129,20 @@ export const AISearchComponent = () => {
             }}
           >
             {agents.map((agent, index) => (
-              <FormSelectOption key={index} value={agent.id} label={agent.agent_name}/>
+              <FormSelectOption
+                key={index}
+                value={agent.id}
+                label={agent.agent_name}
+              />
             ))}
           </FormSelect>
         </FormGroup>
       </Form>
-    )
-  }
-  const getAgentById = (agentId) => {
-
+    );
+  };
+  const getAgentById = agentId => {
     return agents.find(agent => agent.id === parseInt(agentId));
-  } 
+  };
 
   const sendUserQuery = async (agentId: number, userQuery: any) => {
     setLoading(true);
@@ -261,37 +282,44 @@ export const AISearchComponent = () => {
   };
 
   return (
-    <div class={isDarkMode ? 'pf-v5-theme-dark' : ''}>
-      <VirtualAssistant
-        title="inScope AI Search"
-        inputPlaceholder="Ask a question"
-        message={userInputMessage}
-        isSendButtonDisabled={loading}
-        onChangeMessage={(_event, value) => {
-          setUserInputMessage(value);
-        }}
-        onSendMessage={SendMessageHandler}
-        actions={
-          <React.Fragment>
-            <VirtualAssistantAction               aria-label="Clear Conversation"
-              onClick={() => {
-                setConversation([]);
-              }}>
-            <TrashIcon />
-            </VirtualAssistantAction>
-
-          </React.Fragment>
-        }
-      >
-        <AgentSelector />
-        <br/>
-        <ConversationAlert title="AI will search documentation and then summarize and synthesize an answer.">
-          Verify any information before taking action.
-        </ConversationAlert>
-        <Conversation />
-        <ShowLoadingMessage />
-        <ShowErrorMessage />
-      </VirtualAssistant>
-    </div>
+    <Page>
+      <PageSection variant={
+        isDarkMode ? PageSectionVariants.darker : PageSectionVariants.light
+      }>
+        <div class={isDarkMode ? 'pf-v5-theme-dark card-0-3-1' : 'card-0-3-1'}>
+          <VirtualAssistant
+            title="inScope AI Search"
+            inputPlaceholder="Ask a question"
+            message={userInputMessage}
+            isSendButtonDisabled={loading}
+            onChangeMessage={(_event, value) => {
+              setUserInputMessage(value);
+            }}
+            onSendMessage={SendMessageHandler}
+            actions={
+              <React.Fragment>
+                <VirtualAssistantAction
+                  aria-label="Clear Conversation"
+                  onClick={() => {
+                    setConversation([]);
+                  }}
+                >
+                  <TrashIcon />
+                </VirtualAssistantAction>
+              </React.Fragment>
+            }
+          >
+            <AgentSelector />
+            <br />
+            <ConversationAlert title="AI will search documentation and then summarize and synthesize an answer.">
+              Verify any information before taking action.
+            </ConversationAlert>
+            <Conversation />
+            <ShowLoadingMessage />
+            <ShowErrorMessage />
+          </VirtualAssistant>
+        </div>
+      </PageSection>
+    </Page>
   );
 };
