@@ -1,5 +1,6 @@
 #!/bin/bash
 
+rm *.tgz
 yarn workspace @redhatinsights/backstage-plugin-ai-search-frontend export-dynamic
 cd plugins/ai-search-frontend/
 rm *.tgz

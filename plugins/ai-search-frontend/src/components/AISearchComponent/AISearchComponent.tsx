@@ -17,6 +17,7 @@ import {
   FormSelect,
   FormSelectOption,
 } from '@patternfly/react-core';
+import Markdown from 'markdown-to-jsx';
 
 // Style imports needed for the virtual assistant component
 import '@patternfly/react-core/dist/styles/base.css';
@@ -209,7 +210,9 @@ export const AISearchComponent = () => {
       if (conversationEntry.sender === USER) {
         return (
           <UserMessageEntry key={index}>
-            {conversationEntry.text}
+            <Markdown>
+              {conversationEntry.text}
+            </Markdown>
           </UserMessageEntry>
         );
       }
@@ -217,7 +220,9 @@ export const AISearchComponent = () => {
         return (
           <React.Fragment>
             <AssistantMessageEntry key={index}>
-              {conversationEntry.text}
+              <Markdown>
+                {conversationEntry.text}
+              </Markdown>
             </AssistantMessageEntry>
             <Citations conversationEntry={conversationEntry} />
           </React.Fragment>
