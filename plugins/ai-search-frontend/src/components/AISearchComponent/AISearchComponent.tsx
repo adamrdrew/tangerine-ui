@@ -46,6 +46,9 @@ export const AISearchComponent = () => {
   useEffect(() => {
     getAgents();
     modifyPFCardStyle();
+    return () => {
+      removeCustomStyles();
+    }
   }, []);
 
   // Whenever the conversation changes,
@@ -90,27 +93,36 @@ export const AISearchComponent = () => {
   // I need to override some of the patternfly styles because the virtual assistant component is not responsive
   // It has a fixed size and that doesn't work for us
   const modifyPFCardStyle = () => {
+    console.log('Modifying PF card style');
     const style = document.createElement('style');
+    style.id = 'ai-search-styles';
     style.innerHTML = `
-      .card-0-3-1 {
-        height: 100% !important;
-        max-height: 100% !important; /* Ensures the element doesn't grow beyond the parent's height */
-        width: 100% !important;
-        border-radius: 0 !important;
-        overflow: hidden !important; /* Prevents overflow if content grows */
-        box-sizing: border-box; /* Includes padding and border in height calculation */
-        display: flex; /* Flexbox to manage layout within the parent */
-      }
-
-      .cardBody-0-3-6 {
-        max-height: 100% !important;
-        height: 30px !important; /*This is black magic. It forces a correct height even though it looks wrong */
-        box-sizing: border-box; /* Includes padding and border in height calculation */
-      }
-    `;
+    [class*="card-"] {
+      height: 100% !important;
+      max-height: 100% !important; /* Ensures the element doesn't grow beyond the parent's height */
+      width: 100% !important;
+      border-radius: 0 !important;
+      overflow: hidden !important; /* Prevents overflow if content grows */
+      box-sizing: border-box; /* Includes padding and border in height calculation */
+      display: flex; /* Flexbox to manage layout within the parent */
+    }
+  
+    [class*="cardBody-"] {
+      max-height: 100% !important;
+      height: 30px !important; /*This is black magic. It forces a correct height even though it looks wrong */
+      box-sizing: border-box; /* Includes padding and border in height calculation */
+    }
+  `;
     // Append the style element to the document head
     document.head.appendChild(style);
   };
+
+  const removeCustomStyles = () => {
+    const style = document.getElementById('ai-search-styles');
+    if (style) {
+      style.remove();
+    }
+  }
 
   const sendUserQuery = async (agentId: number, userQuery: any) => {
     setLoading(true);
