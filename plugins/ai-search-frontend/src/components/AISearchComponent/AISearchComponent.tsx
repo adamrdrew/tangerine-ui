@@ -93,7 +93,6 @@ export const AISearchComponent = () => {
   // I need to override some of the patternfly styles because the virtual assistant component is not responsive
   // It has a fixed size and that doesn't work for us
   const modifyPFCardStyle = () => {
-    console.log('Modifying PF card style');
     const style = document.createElement('style');
     style.id = 'ai-search-styles';
     style.innerHTML = `
