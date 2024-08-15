@@ -7149,7 +7149,7 @@
     node-addon-api "^3.2.1"
     node-gyp-build "^4.3.0"
 
-"@patternfly/react-core@^5.1.2":
+"@patternfly/react-core@^5.1.2", "@patternfly/react-core@^5.3.4":
   version "5.3.4"
   resolved "https://registry.yarnpkg.com/@patternfly/react-core/-/react-core-5.3.4.tgz#84f85d3528655134cf0bcdb096f82777f0dd69b6"
   integrity sha512-zr2yeilIoFp8MFOo0vNgI8XuM+P2466zHvy4smyRNRH2/but2WObqx7Wu4ftd/eBMYdNqmTeuXe6JeqqRqnPMQ==
