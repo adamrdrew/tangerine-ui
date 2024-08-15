@@ -37,6 +37,8 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
+import '@patternfly/patternfly/patternfly-addons.css';
+
 export const AISearchComponent = () => {
   // Constants
   const BOT = 'ai';
