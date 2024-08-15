@@ -6,4 +6,15 @@ rm *.tgz
 npm pack ./dist-dynamic
 cd ../..
 mv plugins/ai-search-frontend/*.tgz .
-sha256sum *.tgz | awk '{print $1}' | xxd -r -p | base64
+
+# Check if sha256sum is installed
+if command -v sha256sum &> /dev/null
+then
+    sha256sum *.tgz | awk '{print $1}' | xxd -r -p | base64
+elif command -v shasum &> /dev/null
+then
+    shasum -a 256 *.tgz | awk '{print $1}' | xxd -r -p | base64
+else
+    echo "Neither sha256sum nor shasum is installed."
+    exit 1
+fi
