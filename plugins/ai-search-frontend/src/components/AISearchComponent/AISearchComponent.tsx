@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useApi, configApiRef } from '@backstage/core-plugin-api';
-
 import { useTheme } from '@material-ui/core/styles';
-
 import VirtualAssistant from '@patternfly/virtual-assistant/dist/dynamic/VirtualAssistant';
 import ConversationAlert from '@patternfly/virtual-assistant/dist/esm/ConversationAlert';
 import AssistantMessageEntry from '@patternfly/virtual-assistant/dist/dynamic/AssistantMessageEntry';
@@ -10,33 +8,19 @@ import UserMessageEntry from '@patternfly/virtual-assistant/dist/dynamic/UserMes
 import LoadingMessage from '@patternfly/virtual-assistant/dist/esm/LoadingMessage';
 import SystemMessageEntry from '@patternfly/virtual-assistant/dist/esm/SystemMessageEntry';
 import VirtualAssistantAction from '@patternfly/virtual-assistant/dist/dynamic/VirtualAssistantAction';
-import {  TrashIcon } from '@patternfly/react-icons';
-
+import { TrashIcon } from '@patternfly/react-icons';
 import { Page, PageSection, PageSectionVariants } from '@patternfly/react-core';
-
-
-import '@patternfly/react-core/dist/styles/base.css';
-import '@patternfly/react-styles';
-import {
-  Accordion,
-  AccordionItem,
-  AccordionContent,
-  AccordionToggle,
-} from '@patternfly/react-core';
-import { ExpandableSection } from '@patternfly/react-core';
-import Markdown from 'markdown-to-jsx';
-
+import Citations from './Citations';
 import {
   Form,
   FormGroup,
-  FormHelperText,
   FormSelect,
   FormSelectOption,
-  HelperText,
-  HelperTextItem,
-  ValidatedOptions,
 } from '@patternfly/react-core';
 
+// Style imports needed for the virtual assistant component
+import '@patternfly/react-core/dist/styles/base.css';
+import '@patternfly/react-styles';
 import '@patternfly/patternfly/patternfly-addons.css';
 
 export const AISearchComponent = () => {
@@ -56,6 +40,35 @@ export const AISearchComponent = () => {
   const [agents, setAgents] = useState<any>([]);
   const [selectedAgent, setSelectedAgent] = useState<any>({});
 
+  // Side Effects
+
+  // On component mount get the agents and modify the PF card style
+  useEffect(() => {
+    getAgents();
+    modifyPFCardStyle();
+  }, []);
+
+  // Whenever the conversation changes,
+  // If the last message in the conversation is from the user and the bot is not typing, send the user query
+  useEffect(() => {
+    if (
+      conversation.length > 0 &&
+      conversation[conversation.length - 1].sender === USER &&
+      !loading
+    ) {
+      sendUserQuery(1, conversation[conversation.length - 1].text);
+    }
+  }, [conversation]);
+
+  // If we are loading, clear the user input message
+  useEffect(() => {
+    if (loading) {
+      setUserInputMessage('');
+    }
+  }, [loading]);
+
+  // Functions
+
   const getAgents = () => {
     const requestOptions = {
       headers: { 'Content-Type': 'application/json' },
@@ -73,6 +86,9 @@ export const AISearchComponent = () => {
       });
   };
 
+  // This is pretty scary
+  // I need to override some of the patternfly styles because the virtual assistant component is not responsive
+  // It has a fixed size and that doesn't work for us
   const modifyPFCardStyle = () => {
     const style = document.createElement('style');
     style.innerHTML = `
@@ -88,62 +104,12 @@ export const AISearchComponent = () => {
 
       .cardBody-0-3-6 {
         max-height: 100% !important;
+        height: 30px !important; /*This is black magic. It forces a correct height even though it looks wrong */
+        box-sizing: border-box; /* Includes padding and border in height calculation */
       }
     `;
     // Append the style element to the document head
     document.head.appendChild(style);
-  };
-
-  useEffect(() => {
-    getAgents();
-    modifyPFCardStyle();
-  }, []);
-  useEffect(() => {
-    // If the last message in the conversation is from the user and the bot is not typing, send the user query
-    if (
-      conversation.length > 0 &&
-      conversation[conversation.length - 1].sender === USER &&
-      !loading
-    ) {
-      sendUserQuery(1, conversation[conversation.length - 1].text);
-    }
-  }, [conversation]);
-
-  useEffect(() => {
-    if (loading) {
-      setUserInputMessage('');
-    }
-  }, [loading]);
-
-  const AgentSelector = () => {
-    // add a label to this select
-
-    return (
-      <Form>
-        <FormGroup label="Select an agent to chat with" fieldId="select-agent">
-          <FormSelect
-            id="select-agent"
-            aria-label="Select an agent to chat with."
-            value={selectedAgent.id}
-            onChange={(_event, selection) => {
-              const agent = getAgentById(selection);
-              setSelectedAgent(agent);
-            }}
-          >
-            {agents.map((agent, index) => (
-              <FormSelectOption
-                key={index}
-                value={agent.id}
-                label={agent.agent_name}
-              />
-            ))}
-          </FormSelect>
-        </FormGroup>
-      </Form>
-    );
-  };
-  const getAgentById = agentId => {
-    return agents.find(agent => agent.id === parseInt(agentId));
   };
 
   const sendUserQuery = async (agentId: number, userQuery: any) => {
@@ -182,7 +148,7 @@ export const AISearchComponent = () => {
     }
   };
 
-  const SendMessageHandler = (msg: string) => {
+  const sendMessageHandler = (msg: string) => {
     setUserInputMessage('');
     const conversationEntry = {
       text: msg,
@@ -191,18 +157,34 @@ export const AISearchComponent = () => {
     setConversation([...conversation, conversationEntry]);
   };
 
-  const makeAssistantMessageOptions = (entry: any) => {
-    const options = [];
-    if (!entry.search_metadata || entry.search_metadata.length === 0) {
-      return options;
-    }
-    entry.search_metadata.forEach((element: any) => {
-      options.push({
-        title: element.metadata.filename,
-        value: element.value,
-      });
-    });
-    return options;
+  // Components
+
+  const AgentSelector = () => {
+    return (
+      <Form>
+        <FormGroup label="Select an agent to chat with" fieldId="select-agent">
+          <FormSelect
+            id="select-agent"
+            aria-label="Select an agent to chat with."
+            value={selectedAgent.id}
+            onChange={(_event, selection) => {
+              const agent = agents.find(
+                agent => agent.id === parseInt(selection),
+              );
+              setSelectedAgent(agent);
+            }}
+          >
+            {agents.map((agent, index) => (
+              <FormSelectOption
+                key={index}
+                value={agent.id}
+                label={agent.agent_name}
+              />
+            ))}
+          </FormSelect>
+        </FormGroup>
+      </Form>
+    );
   };
 
   const Conversation = () => {
@@ -215,7 +197,6 @@ export const AISearchComponent = () => {
         );
       }
       if (conversationEntry.sender === BOT) {
-        const options = makeAssistantMessageOptions(conversationEntry);
         return (
           <React.Fragment>
             <AssistantMessageEntry key={index}>
@@ -247,47 +228,13 @@ export const AISearchComponent = () => {
     return null;
   };
 
-  const Citation = ({ citation }) => {
-    console.log(citation);
-    const [expanded, setExpanded] = useState(false);
-    return (
-      <AccordionItem>
-        <AccordionToggle
-          onClick={() => setExpanded(!expanded)}
-          isExpanded={expanded}
-        >
-          {citation.metadata.filename}
-        </AccordionToggle>
-        <AccordionContent isHidden={!expanded}>
-          <Markdown>{citation.page_content}</Markdown>
-        </AccordionContent>
-      </AccordionItem>
-    );
-  };
-
-  const Citations = ({ conversationEntry }) => {
-    const [expanded, setExpanded] = useState(false);
-    const citations = conversationEntry.search_metadata.map(
-      (citation, index) => {
-        return <Citation key={index} citation={citation} />;
-      },
-    );
-    return (
-      <ExpandableSection
-        isExpanded={expanded}
-        onToggle={() => setExpanded(!expanded)}
-        toggleText="Citations"
-      >
-        <Accordion>{citations}</Accordion>
-      </ExpandableSection>
-    );
-  };
-
   return (
     <Page>
-      <PageSection variant={
-        isDarkMode ? PageSectionVariants.darker : PageSectionVariants.light
-      }>
+      <PageSection
+        variant={
+          isDarkMode ? PageSectionVariants.darker : PageSectionVariants.light
+        }
+      >
         <div class={isDarkMode ? 'pf-v5-theme-dark card-0-3-1' : 'card-0-3-1'}>
           <VirtualAssistant
             title="inScope AI Search"
@@ -297,7 +244,7 @@ export const AISearchComponent = () => {
             onChangeMessage={(_event, value) => {
               setUserInputMessage(value);
             }}
-            onSendMessage={SendMessageHandler}
+            onSendMessage={sendMessageHandler}
             actions={
               <React.Fragment>
                 <VirtualAssistantAction
