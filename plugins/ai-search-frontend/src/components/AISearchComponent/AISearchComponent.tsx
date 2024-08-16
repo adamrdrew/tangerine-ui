@@ -102,7 +102,7 @@ export const AISearchComponent = () => {
       headers: { 'Content-Type': 'application/json' },
     };
 
-    fetch(`${backendUrl}/api/proxy/backend/api/agents`, requestOptions)
+    fetch(`${backendUrl}/api/proxy/tangerine/api/agents`, requestOptions)
       .then(response => response.json())
       .then(response => {
         setAgents(response.data);
@@ -169,7 +169,7 @@ export const AISearchComponent = () => {
 
     if (userQuery !== '') {
       await fetch(
-        `${backendUrl}/api/proxy/backend/api/agents/${selectedAgent.id}/chat`,
+        `${backendUrl}/api/proxy/tangerine/api/agents/${selectedAgent.id}/chat`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

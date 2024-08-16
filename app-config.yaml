@@ -45,10 +45,10 @@ integrations:
 
 proxy:
   endpoints:
-    '/backend':
+    '/tangerine':
       target: ${TANGERINE_CLUSTER_URL}
       headers:
-        Authorization: Bearer ${CLUSTER_API_TOKEN}
+        Authorization: Bearer ${TANGERINE_CLUSTER_API_TOKEN}
       allowedMethods: ['POST', 'GET']
       credentials: dangerously-allow-unauthenticated
 
