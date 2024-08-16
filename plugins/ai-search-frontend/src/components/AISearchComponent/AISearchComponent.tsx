@@ -106,7 +106,16 @@ export const AISearchComponent = () => {
       .then(response => response.json())
       .then(response => {
         setAgents(response.data);
-        setSelectedAgent(response.data[0]);
+        // HACK: Look for an agent named "All-DOCs" and select it by default
+        // if it isn't there just use the first agent
+        const allDocsAgent = response.data.find(
+          agent => agent.agent_name === 'All-DOCs',
+        );
+        if (allDocsAgent) {
+          setSelectedAgent(allDocsAgent);
+        } else {
+          setSelectedAgent(response.data[0]);
+        }
       })
       .catch(_error => {
         setError(true);
