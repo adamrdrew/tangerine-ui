@@ -24,10 +24,34 @@ import '@patternfly/react-core/dist/styles/base.css';
 import '@patternfly/react-styles';
 import '@patternfly/patternfly/patternfly-addons.css';
 
+const BOT = 'ai';
+const USER = 'human';
+
+const Conversation = ({ conversation }) => {
+  return conversation.map((conversationEntry, index) => {
+    if (conversationEntry.sender === USER) {
+      return (
+        <UserMessageEntry key={index}>
+          <Markdown>{conversationEntry.text}</Markdown>
+        </UserMessageEntry>
+      );
+    }
+    if (conversationEntry.sender === BOT) {
+      return (
+        <React.Fragment key={index}>
+          <AssistantMessageEntry>
+            <Markdown>{conversationEntry.text}</Markdown>
+          </AssistantMessageEntry>
+          <Citations conversationEntry={conversationEntry} />
+        </React.Fragment>
+      );
+    }
+    return null;
+  });
+};
+
 export const AISearchComponent = () => {
   // Constants
-  const BOT = 'ai';
-  const USER = 'human';
   const config = useApi(configApiRef);
   const backendUrl = config.getString('backend.baseUrl');
   const theme = useTheme();
@@ -205,33 +229,6 @@ export const AISearchComponent = () => {
     );
   };
 
-  const Conversation = () => {
-    return conversation.map((conversationEntry, index) => {
-      if (conversationEntry.sender === USER) {
-        return (
-          <UserMessageEntry key={index}>
-            <Markdown>
-              {conversationEntry.text}
-            </Markdown>
-          </UserMessageEntry>
-        );
-      }
-      if (conversationEntry.sender === BOT) {
-        return (
-          <React.Fragment>
-            <AssistantMessageEntry key={index}>
-              <Markdown>
-                {conversationEntry.text}
-              </Markdown>
-            </AssistantMessageEntry>
-            <Citations conversationEntry={conversationEntry} />
-          </React.Fragment>
-        );
-      }
-      return null;
-    });
-  };
-
   const ShowLoadingMessage = () => {
     if (loading) {
       return <LoadingMessage />;
@@ -258,7 +255,11 @@ export const AISearchComponent = () => {
           isDarkMode ? PageSectionVariants.darker : PageSectionVariants.light
         }
       >
-        <div class={isDarkMode ? 'pf-v5-theme-dark cardThemeBody' : 'cardThemeBody'}>
+        <div
+          class={
+            isDarkMode ? 'pf-v5-theme-dark cardThemeBody' : 'cardThemeBody'
+          }
+        >
           <VirtualAssistant
             title="inScope AI Search"
             inputPlaceholder="Ask a question"
@@ -286,7 +287,7 @@ export const AISearchComponent = () => {
             <ConversationAlert title="AI will search documentation and then summarize and synthesize an answer.">
               Verify any information before taking action.
             </ConversationAlert>
-            <Conversation />
+            <Conversation conversation={conversation} />
             <ShowLoadingMessage />
             <ShowErrorMessage />
           </VirtualAssistant>
