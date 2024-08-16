@@ -7,24 +7,16 @@ import AssistantMessageEntry from '@patternfly/virtual-assistant/dist/dynamic/As
 import UserMessageEntry from '@patternfly/virtual-assistant/dist/dynamic/UserMessageEntry';
 import LoadingMessage from '@patternfly/virtual-assistant/dist/esm/LoadingMessage';
 import SystemMessageEntry from '@patternfly/virtual-assistant/dist/esm/SystemMessageEntry';
-import VirtualAssistantAction from '@patternfly/virtual-assistant/dist/dynamic/VirtualAssistantAction';
-import { CommentsIcon, TrashIcon } from '@patternfly/react-icons';
+import { CommentsIcon } from '@patternfly/react-icons';
 import {
   Grid,
   GridItem,
   Page,
   PageSection,
   PageSectionVariants,
-  Split,
-  SplitItem,
 } from '@patternfly/react-core';
 import Citations from './Citations';
-import {
-  Form,
-  FormGroup,
-  FormSelect,
-  FormSelectOption,
-} from '@patternfly/react-core';
+import { Form, FormSelect, FormSelectOption } from '@patternfly/react-core';
 import Markdown from 'markdown-to-jsx';
 
 // Style imports needed for the virtual assistant component
@@ -35,8 +27,6 @@ import { Button } from '@patternfly/react-core';
 
 const BOT = 'ai';
 const USER = 'human';
-
-
 
 const Conversation = ({ conversation }) => {
   return conversation.map((conversationEntry, index) => {
@@ -50,7 +40,7 @@ const Conversation = ({ conversation }) => {
     if (conversationEntry.sender === BOT) {
       return (
         <React.Fragment key={index}>
-          <AssistantMessageEntry>
+          <AssistantMessageEntry title="Convo">
             <Markdown>{conversationEntry.text}</Markdown>
           </AssistantMessageEntry>
           <Citations conversationEntry={conversationEntry} />
@@ -193,7 +183,7 @@ export const AISearchComponent = () => {
     }
   };
 
-  const sendQueryToServer = async (agentId: number, userQuery: any) => {
+  const sendQueryToServer = async (_agentId: number, userQuery: any) => {
     try {
       const response = await fetch(
         `${backendUrl}/api/proxy/tangerine/api/agents/${selectedAgent.id}/chat`,
@@ -314,23 +304,25 @@ export const AISearchComponent = () => {
   // Components
 
   const ChatToolBar = () => {
-    return (            <Grid>
-      <GridItem span={9} />
-      <GridItem span={2}>
-        <AgentSelector />
-      </GridItem>
-      <GridItem span={1}>
-        <Button
-          variant="control"
-          onClick={() => {
-            setConversation([]);
-          }}
-        >
-          New Chat
-        </Button>
-      </GridItem>
-    </Grid>)
-  }
+    return (
+      <Grid>
+        <GridItem span={9} />
+        <GridItem span={2}>
+          <AgentSelector />
+        </GridItem>
+        <GridItem span={1}>
+          <Button
+            variant="control"
+            onClick={() => {
+              setConversation([]);
+            }}
+          >
+            New Chat
+          </Button>
+        </GridItem>
+      </Grid>
+    );
+  };
 
   const AgentSelector = () => {
     return (
@@ -400,7 +392,7 @@ export const AISearchComponent = () => {
             }}
             onSendMessage={sendMessageHandler}
           >
-            <ChatToolBar/>
+            <ChatToolBar />
             <br />
             <ConversationAlert title="Convo will search documentation and then synthesize and summarize an answer.">
               Convo is powered by a Large Language Model. Verify any information
