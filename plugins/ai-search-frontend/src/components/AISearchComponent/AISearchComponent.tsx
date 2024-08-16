@@ -193,7 +193,7 @@ export const AISearchComponent = () => {
           body: JSON.stringify({
             query: userQuery,
             stream: 'true',
-            prvMsgs: conversation,
+            prevMsgs: conversation,
           }),
           cache: 'no-cache',
         },
