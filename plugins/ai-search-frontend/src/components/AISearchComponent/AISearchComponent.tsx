@@ -8,8 +8,16 @@ import UserMessageEntry from '@patternfly/virtual-assistant/dist/dynamic/UserMes
 import LoadingMessage from '@patternfly/virtual-assistant/dist/esm/LoadingMessage';
 import SystemMessageEntry from '@patternfly/virtual-assistant/dist/esm/SystemMessageEntry';
 import VirtualAssistantAction from '@patternfly/virtual-assistant/dist/dynamic/VirtualAssistantAction';
-import { TrashIcon } from '@patternfly/react-icons';
-import { Page, PageSection, PageSectionVariants } from '@patternfly/react-core';
+import { CommentsIcon, TrashIcon } from '@patternfly/react-icons';
+import {
+  Grid,
+  GridItem,
+  Page,
+  PageSection,
+  PageSectionVariants,
+  Split,
+  SplitItem,
+} from '@patternfly/react-core';
 import Citations from './Citations';
 import {
   Form,
@@ -23,9 +31,12 @@ import Markdown from 'markdown-to-jsx';
 import '@patternfly/react-core/dist/styles/base.css';
 import '@patternfly/react-styles';
 import '@patternfly/patternfly/patternfly-addons.css';
+import { Button } from '@patternfly/react-core';
 
 const BOT = 'ai';
 const USER = 'human';
+
+
 
 const Conversation = ({ conversation }) => {
   return conversation.map((conversationEntry, index) => {
@@ -64,6 +75,8 @@ export const AISearchComponent = () => {
   const [error, setError] = useState<boolean>(false);
   const [agents, setAgents] = useState<any>([]);
   const [selectedAgent, setSelectedAgent] = useState<any>({});
+  const [responseIsStreaming, setResponseIsStreaming] =
+    useState<boolean>(false);
 
   // Side Effects
 
@@ -164,39 +177,129 @@ export const AISearchComponent = () => {
   };
 
   const sendUserQuery = async (agentId: number, userQuery: any) => {
-    setLoading(true);
-    setError(false);
+    try {
+      setLoading(true);
+      setError(false);
+      setResponseIsStreaming(false);
 
-    if (userQuery !== '') {
-      await fetch(
+      if (userQuery === '') return;
+
+      const response = await sendQueryToServer(agentId, userQuery);
+      const reader = createStreamReader(response);
+
+      await processStream(reader);
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
+  const sendQueryToServer = async (agentId: number, userQuery: any) => {
+    try {
+      const response = await fetch(
         `${backendUrl}/api/proxy/tangerine/api/agents/${selectedAgent.id}/chat`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             query: userQuery,
-            stream: false,
+            stream: 'true',
             prvMsgs: conversation,
           }),
           cache: 'no-cache',
         },
-      )
-        .then(response => response.json())
-        .then(response => {
-          setLoading(false);
-          const conversationEntry = {
-            text: response.text_content,
-            sender: BOT,
-            search_metadata: response.search_metadata,
-          };
-          setConversation([...conversation, conversationEntry]);
-        })
-        .catch(_error => {
-          setLoading(false);
-          setError(true);
-          console.error(`Error fetching response from backend chat bot server`);
-        });
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Server responded with ${response.status}: ${response.statusText}`,
+        );
+      }
+
+      return response;
+    } catch (error) {
+      throw new Error(`Failed to send query to server: ${error.message}`);
     }
+  };
+
+  const createStreamReader = (response: Response) => {
+    try {
+      return response.body
+        .pipeThrough(new TextDecoderStream('utf-8'))
+        .getReader();
+    } catch (error) {
+      throw new Error(`Failed to create stream reader: ${error.message}`);
+    }
+  };
+
+  const processStream = async (reader: ReadableStreamDefaultReader) => {
+    try {
+      while (true) {
+        const chunk = await reader.read();
+        const { done, value } = chunk;
+
+        if (done) {
+          setResponseIsStreaming(false);
+          break;
+        }
+
+        setLoading(false);
+        setResponseIsStreaming(true);
+        processChunk(value);
+      }
+    } catch (error) {
+      throw new Error(`Error processing stream: ${error.message}`);
+    }
+  };
+
+  const processChunk = (value: string) => {
+    try {
+      const matches = [...value.matchAll(/data: (\{.*\})\r\n/g)];
+
+      for (const match of matches) {
+        const jsonString = match[1];
+        const { text_content, search_metadata } = JSON.parse(jsonString);
+
+        if (text_content || search_metadata) {
+          updateConversation(text_content, search_metadata);
+        }
+      }
+    } catch (error) {
+      throw new Error(`Failed to process chunk: ${error.message}`);
+    }
+  };
+
+  const updateConversation = (text_content: string, search_metadata: any) => {
+    setConversation(prevMessages => {
+      const lastMessage = prevMessages[prevMessages.length - 1];
+
+      if (lastMessage.sender !== BOT) {
+        const newMessage = {
+          sender: BOT,
+          text: text_content,
+          done: false,
+        };
+        return [...prevMessages, newMessage];
+      }
+
+      const updatedMessages = [...prevMessages];
+
+      if (text_content) {
+        updatedMessages[updatedMessages.length - 1].text += text_content;
+      }
+
+      if (search_metadata) {
+        updatedMessages[updatedMessages.length - 1].search_metadata =
+          search_metadata;
+        updatedMessages[updatedMessages.length - 1].done = true;
+      }
+
+      return updatedMessages;
+    });
+  };
+
+  const handleError = (error: Error) => {
+    setError(true);
+    console.error(error.message);
   };
 
   const sendMessageHandler = (msg: string) => {
@@ -210,30 +313,47 @@ export const AISearchComponent = () => {
 
   // Components
 
+  const ChatToolBar = () => {
+    return (            <Grid>
+      <GridItem span={9} />
+      <GridItem span={2}>
+        <AgentSelector />
+      </GridItem>
+      <GridItem span={1}>
+        <Button
+          variant="control"
+          onClick={() => {
+            setConversation([]);
+          }}
+        >
+          New Chat
+        </Button>
+      </GridItem>
+    </Grid>)
+  }
+
   const AgentSelector = () => {
     return (
       <Form>
-        <FormGroup label="Select an agent to chat with" fieldId="select-agent">
-          <FormSelect
-            id="select-agent"
-            aria-label="Select an agent to chat with."
-            value={selectedAgent.id}
-            onChange={(_event, selection) => {
-              const agent = agents.find(
-                agent => agent.id === parseInt(selection),
-              );
-              setSelectedAgent(agent);
-            }}
-          >
-            {agents.map((agent, index) => (
-              <FormSelectOption
-                key={index}
-                value={agent.id}
-                label={agent.agent_name}
-              />
-            ))}
-          </FormSelect>
-        </FormGroup>
+        <FormSelect
+          id="select-agent"
+          aria-label="Agent Selector"
+          value={selectedAgent.id}
+          onChange={(_event, selection) => {
+            const agent = agents.find(
+              agent => agent.id === parseInt(selection),
+            );
+            setSelectedAgent(agent);
+          }}
+        >
+          {agents.map((agent, index) => (
+            <FormSelectOption
+              key={index}
+              value={agent.id}
+              label={agent.agent_name + '       '}
+            />
+          ))}
+        </FormSelect>
       </Form>
     );
   };
@@ -270,31 +390,22 @@ export const AISearchComponent = () => {
           }
         >
           <VirtualAssistant
-            title="inScope AI Search"
-            inputPlaceholder="Ask a question"
+            icon={CommentsIcon}
+            title="Convo"
+            inputPlaceholder="What can Convo help you with?"
             message={userInputMessage}
-            isSendButtonDisabled={loading}
+            isSendButtonDisabled={loading || responseIsStreaming}
             onChangeMessage={(_event, value) => {
               setUserInputMessage(value);
             }}
             onSendMessage={sendMessageHandler}
-            actions={
-              <React.Fragment>
-                <VirtualAssistantAction
-                  aria-label="Clear Conversation"
-                  onClick={() => {
-                    setConversation([]);
-                  }}
-                >
-                  <TrashIcon />
-                </VirtualAssistantAction>
-              </React.Fragment>
-            }
           >
-            <AgentSelector />
+            <ChatToolBar/>
             <br />
-            <ConversationAlert title="AI will search documentation and then summarize and synthesize an answer.">
-              Verify any information before taking action.
+            <ConversationAlert title="Convo will search documentation and then synthesize and summarize an answer.">
+              Convo is powered by a Large Language Model. Verify any information
+              it provides before taking action. The sources used to construct
+              your answer are listed in the citations.
             </ConversationAlert>
             <Conversation conversation={conversation} />
             <ShowLoadingMessage />
