@@ -17,10 +17,14 @@ const Citation = ({ citation }) => {
         {citation.metadata.filename}
       </AccordionToggle>
       <AccordionContent isHidden={!expanded}>
-        <Markdown>{citation.page_content}</Markdown>
+        { expanded ? <Markdown>{citation.page_content}</Markdown> : null }
       </AccordionContent>
     </AccordionItem>
   );
 };
 
-export default Citation;
+const areEqual = (prevProps, nextProps) => {
+  return prevProps.citation.page_content === nextProps.citation.page_content;
+}
+
+export default React.memo(Citation);
