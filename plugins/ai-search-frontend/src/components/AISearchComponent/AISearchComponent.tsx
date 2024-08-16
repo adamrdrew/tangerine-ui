@@ -122,6 +122,8 @@ export const AISearchComponent = () => {
       })
       .catch(_error => {
         setError(true);
+        setLoading(false);
+        setResponseIsStreaming(false);
         console.error(`Error fetching agents from backend`);
       });
   };
@@ -193,7 +195,7 @@ export const AISearchComponent = () => {
           body: JSON.stringify({
             query: userQuery,
             stream: 'true',
-            prevMsgs: conversation,
+            prvMsgs: conversation,
           }),
           cache: 'no-cache',
         },
@@ -222,12 +224,16 @@ export const AISearchComponent = () => {
   };
 
   const processStream = async (reader: ReadableStreamDefaultReader) => {
+    setLoading(false);
     try {
       while (true) {
         const chunk = await reader.read();
+        console.log(chunk);
         const { done, value } = chunk;
 
         if (done) {
+          console.log('Stream done');
+          setLoading(false);
           setResponseIsStreaming(false);
           break;
         }
@@ -289,6 +295,8 @@ export const AISearchComponent = () => {
 
   const handleError = (error: Error) => {
     setError(true);
+    setResponseIsStreaming(false);
+    setLoading(false);
     console.error(error.message);
   };
 
@@ -361,7 +369,7 @@ export const AISearchComponent = () => {
     if (error) {
       return (
         <SystemMessageEntry>
-          Error fetching response from backend chat bot server
+          😿 Something went wrong talking Convo's brain. Try back later.
         </SystemMessageEntry>
       );
     }
