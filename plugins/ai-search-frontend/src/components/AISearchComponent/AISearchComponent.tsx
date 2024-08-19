@@ -194,7 +194,6 @@ export const AISearchComponent = () => {
   }
 
   const sendQueryToServer = async (_agentId: number, userQuery: any) => {
-    console.log(previousMessages())
     try {
       const response = await fetch(
         `${backendUrl}/api/proxy/tangerine/api/agents/${selectedAgent.id}/chat`,
@@ -237,11 +236,9 @@ export const AISearchComponent = () => {
     try {
       while (true) {
         const chunk = await reader.read();
-        console.log(chunk);
         const { done, value } = chunk;
 
         if (done) {
-          console.log('Stream done');
           setLoading(false);
           setResponseIsStreaming(false);
           break;
