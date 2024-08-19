@@ -185,6 +185,14 @@ export const AISearchComponent = () => {
     }
   };
 
+  const previousMessages = () => {
+    // We want everything in the conversations array EXCEPT the last message
+    // This is because the last message is the one that the user just sent
+    // and the server gets mad if the previous messages aren't exactly 
+    // alternating between user and bot
+    return conversation.slice(0, conversation.length - 1);
+  }
+
   const sendQueryToServer = async (_agentId: number, userQuery: any) => {
     try {
       const response = await fetch(
@@ -195,7 +203,7 @@ export const AISearchComponent = () => {
           body: JSON.stringify({
             query: userQuery,
             stream: 'true',
-            prvMsgs: conversation,
+            prevMsgs: previousMessages()
           }),
           cache: 'no-cache',
         },
@@ -228,11 +236,9 @@ export const AISearchComponent = () => {
     try {
       while (true) {
         const chunk = await reader.read();
-        console.log(chunk);
         const { done, value } = chunk;
 
         if (done) {
-          console.log('Stream done');
           setLoading(false);
           setResponseIsStreaming(false);
           break;
@@ -305,6 +311,7 @@ export const AISearchComponent = () => {
     const conversationEntry = {
       text: msg,
       sender: USER,
+      done: false
     };
     setConversation([...conversation, conversationEntry]);
   };
