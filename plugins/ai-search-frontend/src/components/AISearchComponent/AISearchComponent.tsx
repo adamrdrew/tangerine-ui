@@ -109,10 +109,10 @@ export const AISearchComponent = () => {
       .then(response => response.json())
       .then(response => {
         setAgents(response.data);
-        // HACK: Look for an agent named "All-DOCs" and select it by default
+        // HACK: Look for an agent named "'inscope-all-docs-agent'" and select it by default
         // if it isn't there just use the first agent
         const allDocsAgent = response.data.find(
-          agent => agent.agent_name === 'All-DOCs',
+          agent => agent.agent_name === 'inscope-all-docs-agent',
         );
         if (allDocsAgent) {
           setSelectedAgent(allDocsAgent);
@@ -233,10 +233,14 @@ export const AISearchComponent = () => {
 
   const processStream = async (reader: ReadableStreamDefaultReader) => {
     setLoading(false);
+    setResponseIsStreaming(true);
     try {
       while (true) {
         const chunk = await reader.read();
         const { done, value } = chunk;
+
+
+        processChunk(value);
 
         if (done) {
           setLoading(false);
@@ -244,12 +248,9 @@ export const AISearchComponent = () => {
           break;
         }
 
-        setLoading(false);
-        setResponseIsStreaming(true);
-        processChunk(value);
       }
     } catch (error) {
-      throw new Error(`Error processing stream: ${error.message}`);
+      console.log(`Error processing stream: ${error.message}`);
     }
   };
 
@@ -260,13 +261,12 @@ export const AISearchComponent = () => {
       for (const match of matches) {
         const jsonString = match[1];
         const { text_content, search_metadata } = JSON.parse(jsonString);
-
         if (text_content || search_metadata) {
           updateConversation(text_content, search_metadata);
         }
       }
     } catch (error) {
-      throw new Error(`Failed to process chunk: ${error.message}`);
+      console.log(`Failed to process chunk: ${error.message}`);
     }
   };
 
