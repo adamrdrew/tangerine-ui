@@ -1,81 +1,60 @@
-# [Backstage](https://backstage.io)
+# Convo AI Search Assistant Plugin
 
-This is your newly scaffolded Backstage App, Good Luck!
+This is a frontend plugin that provides a conversational AI search interface that talks to [Tangerine](https://github.com/RedHatInsights/tangerine-backend).
 
-## Setup Proxy Config
-```
-proxy:
-  endpoints:
-    '/backend':
-      target: "https://tangerine.apps.rhods-internal.61tk.p1.openshiftapps.com:6443"
-      headers:
-        Authorization: "Bearer ${CLUSTER_API_TOKEN}"
-```
-
-To start the app, run:
+## Development
+Before starting:
+* Make sure you are using Node 18
+* Run `yarn install`
+* You'll need the URL for your tangerine server as well as the OAuth token exported as environment variables:
 
 ```sh
-yarn install
+export TANGERINE_CLUSTER_URL="tangerine.mycompany.com"
+export TANGERINE_CLUSTER_API_TOKEN="DEADBEEFDEADBEEFDEADBEEFDEADBEEF"
+```
+
+With all of that in place you can start the dev server:
+
+```sh
 yarn dev
 ```
 
-## AI Assisted Search Dynamic Plugin
+The app will be running on `localhost:3000`
 
-This is a development mono-repo for the Openshift Information plugin. This mono-repo was created using @backstage/create-app to provide a backend and frontend for the plugin to integrate with.
+## Deploy to RHDH
 
-You can find the plugin code in `plugins/openshift`
-
-## Components
-
-### Entity Page Card
-
-* `EntityOpenshiftInfoContent`: Displays Openshift Deployment information about each service in the Catalog. The following information is provided per deployment:
-  * Deployment status
-  * Name of deployment
-  * Deployed image tag
-  * CPU usage
-  * Memory usage
-  * Last deployment time
-
-## Configuration
+### Proxy Config
 
 In `app-config.yaml` first add the proxy:
 
 ```yaml
 proxy:
   endpoints:
-    '/backend':
-      target: 'https://api.my.openshift.cluster.com'
+    '/tangerine':
+      target: "tangerine.mycompany.com"
       headers:
-        Authorization: "Bearer ${CLUSTER_API_TOKEN}"
+        Authorization: "Bearer DEADBEEFDEADBEEFDEADBEEFDEADBEEF"
 ```
 
-Also in `app-config.yaml` add `redhatinsights.backstage-plugin-openshift` and the card component configs into the dynamic plugins section.
+### Dynamic Plugin Config
 
-
-TODO: Need to update this
+Add this to the dynmaic plugins config file
 ```yaml
-dynamicPlugins:
-  frontend:
-    redhatinsights.backstage-plugin-ai-search-frontend:
-      dynamicRoutes:
-        - path: /ai-search-frontend
-          importName: AISearchFrontendPage
-          menuItem:
-            icon: 'kind:resource'
-            text: AI Search
+    - package: "https://github.com/RedHatInsights/backstage-plugin-ai-search-frontend/releases/download/v0.2.9/redhatinsights-backstage-plugin-ai-search-frontend-dynamic-0.2.9.tgz"
+      disabled: false
+      integrity: "sha256-2lwrT6OIXWCaNFsR+Ns6T5MDWRmYUSGW8VpyeWwPLtU="
+      pluginConfig:
+        dynamicPlugins:
+          frontend:
+            redhatinsights.backstage-plugin-ai-search-frontend:
+              dynamicRoutes:
+                - path: /convo
+                  importName: AISearchFrontendPage
+                  menuItem:
+                    icon: 'chat'
+                    text: "Convo: AI Search"
+
 ```
-
-## Development
-
-To start the app, run:
-
-```sh
-yarn install
-yarn dev
-```
-
-Before you do, you'll likely want to have catalog entries to see the plugin working on. Check out AppStage for that. 
 
 ### Build the Dynamic Plugin
 
