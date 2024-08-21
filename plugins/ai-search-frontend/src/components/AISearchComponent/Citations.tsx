@@ -18,7 +18,7 @@ const Citations = ({ conversationEntry }) => {
       onToggle={() => setExpanded(!expanded)}
       toggleText="Citations"
     >
-      <Accordion>{citations}</Accordion>
+      <Accordion togglePosition="start">{citations}</Accordion>
     </ExpandableSection>
   );
 };
