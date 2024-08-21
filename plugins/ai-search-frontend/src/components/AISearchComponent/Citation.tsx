@@ -36,7 +36,7 @@ const CitationContent = ({ citation, expanded }) => {
   }
   return (
     <Card>
-      <CardTitle style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <CardTitle >
         <Button
           variant="link"
           icon={<ExternalLinkSquareAltIcon />}
@@ -48,10 +48,9 @@ const CitationContent = ({ citation, expanded }) => {
           Read Citation Source
         </Button>
       </CardTitle>
-
       <CardBody>
         <TextContent>
-          <Markdown>{citation.page_content}</Markdown>
+          <Markdown style={{marginLeft: '1em'}}>{citation.page_content}</Markdown>
         </TextContent>
       </CardBody>
     </Card>

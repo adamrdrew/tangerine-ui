@@ -14,16 +14,22 @@ import {
   Page,
   PageSection,
   PageSectionVariants,
+  Split,
+  SplitItem,
+  Title,
+  TitleSizes,
+  FormSelect,
+  FormSelectOption,
+  Button,
 } from '@patternfly/react-core';
 import Citations from './Citations';
-import { Form, FormSelect, FormSelectOption } from '@patternfly/react-core';
+
 import Markdown from 'markdown-to-jsx';
 
 // Style imports needed for the virtual assistant component
 import '@patternfly/react-core/dist/styles/base.css';
 import '@patternfly/react-styles';
 import '@patternfly/patternfly/patternfly-addons.css';
-import { Button } from '@patternfly/react-core';
 
 const BOT = 'ai';
 const USER = 'human';
@@ -151,6 +157,10 @@ export const AISearchComponent = () => {
       box-sizing: border-box; !important;/* Includes padding and border in height calculation */
     }
 
+    [class*="cardHeader-"] {
+      display: none !important;
+    }
+
     .cardThemeBody {
       max-height: 100% !important;
       height: 100% !important; 
@@ -188,10 +198,10 @@ export const AISearchComponent = () => {
   const previousMessages = () => {
     // We want everything in the conversations array EXCEPT the last message
     // This is because the last message is the one that the user just sent
-    // and the server gets mad if the previous messages aren't exactly 
+    // and the server gets mad if the previous messages aren't exactly
     // alternating between user and bot
     return conversation.slice(0, conversation.length - 1);
-  }
+  };
 
   const sendQueryToServer = async (_agentId: number, userQuery: any) => {
     try {
@@ -203,7 +213,7 @@ export const AISearchComponent = () => {
           body: JSON.stringify({
             query: userQuery,
             stream: 'true',
-            prevMsgs: previousMessages()
+            prevMsgs: previousMessages(),
           }),
           cache: 'no-cache',
         },
@@ -239,7 +249,6 @@ export const AISearchComponent = () => {
         const chunk = await reader.read();
         const { done, value } = chunk;
 
-
         processChunk(value);
 
         if (done) {
@@ -247,7 +256,6 @@ export const AISearchComponent = () => {
           setResponseIsStreaming(false);
           break;
         }
-
       }
     } catch (error) {
       console.log(`Error processing stream: ${error.message}`);
@@ -311,59 +319,12 @@ export const AISearchComponent = () => {
     const conversationEntry = {
       text: msg,
       sender: USER,
-      done: false
+      done: false,
     };
     setConversation([...conversation, conversationEntry]);
   };
 
   // Components
-
-  const ChatToolBar = () => {
-    return (
-      <Grid>
-        <GridItem span={9} />
-        <GridItem span={2}>
-          <AgentSelector />
-        </GridItem>
-        <GridItem span={1}>
-          <Button
-            variant="control"
-            onClick={() => {
-              setConversation([]);
-            }}
-          >
-            New Chat
-          </Button>
-        </GridItem>
-      </Grid>
-    );
-  };
-
-  const AgentSelector = () => {
-    return (
-      <Form>
-        <FormSelect
-          id="select-agent"
-          aria-label="Agent Selector"
-          value={selectedAgent.id}
-          onChange={(_event, selection) => {
-            const agent = agents.find(
-              agent => agent.id === parseInt(selection),
-            );
-            setSelectedAgent(agent);
-          }}
-        >
-          {agents.map((agent, index) => (
-            <FormSelectOption
-              key={index}
-              value={agent.id}
-              label={agent.agent_name + '       '}
-            />
-          ))}
-        </FormSelect>
-      </Form>
-    );
-  };
 
   const ShowLoadingMessage = () => {
     if (loading) {
@@ -383,8 +344,69 @@ export const AISearchComponent = () => {
     return null;
   };
 
+  const AgentSelect = () => {
+    return (
+      <FormSelect
+        id="select-agent"
+        aria-label="Agent Selector"
+        value={selectedAgent.id}
+        onChange={(_event, selection) => {
+          const agent = agents.find(agent => agent.id === parseInt(selection));
+          setSelectedAgent(agent);
+        }}
+      >
+        {agents.map((agent, index) => (
+          <FormSelectOption
+            key={index}
+            value={agent.id}
+            label={agent.agent_name + '       '}
+          />
+        ))}
+      </FormSelect>
+    );
+  };
+
+  const NewChatButton = () => {
+    return (
+      <Button
+        onClick={() => {
+          setConversation([]);
+        }}
+      >
+        New Chat
+      </Button>
+    );
+  };
+
+  const HeaderToolBar = () => {
+    return (
+      <PageSection
+        style={{ backgroundColor: '#EE0000' }}
+        variant={
+          isDarkMode ? PageSectionVariants.dark : PageSectionVariants.darker
+        }
+      >
+        <Split hasGutter>
+          <SplitItem>
+            <Title headingLevel="h1" size={TitleSizes['3xl']}>
+              Convo
+            </Title>
+          </SplitItem>
+          <SplitItem isFilled />
+          <SplitItem>
+            <AgentSelect />
+          </SplitItem>
+          <SplitItem>
+            <NewChatButton />
+          </SplitItem>
+        </Split>
+      </PageSection>
+    );
+  };
+
   return (
     <Page>
+      <HeaderToolBar />
       <PageSection
         padding={{ default: 'noPadding' }}
         variant={
@@ -396,28 +418,32 @@ export const AISearchComponent = () => {
             isDarkMode ? 'pf-v5-theme-dark cardThemeBody' : 'cardThemeBody'
           }
         >
-          <VirtualAssistant
-            icon={CommentsIcon}
-            title="Convo"
-            inputPlaceholder="What can Convo help you with?"
-            message={userInputMessage}
-            isSendButtonDisabled={loading || responseIsStreaming}
-            onChangeMessage={(_event, value) => {
-              setUserInputMessage(value);
-            }}
-            onSendMessage={sendMessageHandler}
-          >
-            <ChatToolBar />
-            <br />
-            <ConversationAlert title="Convo will search documentation and then synthesize and summarize an answer.">
-              Convo is powered by a Large Language Model. Verify any information
-              it provides before taking action. The sources used to construct
-              your answer are listed in the citations.
-            </ConversationAlert>
-            <Conversation conversation={conversation} />
-            <ShowLoadingMessage />
-            <ShowErrorMessage />
-          </VirtualAssistant>
+          <Grid style={{ height: '100%' }}>
+            <GridItem span={2} rowSpan={12}></GridItem>
+            <GridItem span={8} rowSpan={12}>
+              <VirtualAssistant
+                icon={CommentsIcon}
+                title="Convo"
+                inputPlaceholder="What can Convo help you with?"
+                message={userInputMessage}
+                isSendButtonDisabled={loading || responseIsStreaming}
+                onChangeMessage={(_event, value) => {
+                  setUserInputMessage(value);
+                }}
+                onSendMessage={sendMessageHandler}
+              >
+                <ConversationAlert title="Convo will search documentation and then synthesize and summarize an answer.">
+                  Convo is powered by a Large Language Model. Verify any
+                  information it provides before taking action. The sources used
+                  to construct your answer are listed in the citations.
+                </ConversationAlert>
+                <Conversation conversation={conversation} />
+                <ShowLoadingMessage />
+                <ShowErrorMessage />
+              </VirtualAssistant>
+            </GridItem>
+            <GridItem span={2} rowSpan={12}></GridItem>
+          </Grid>
         </div>
       </PageSection>
     </Page>
