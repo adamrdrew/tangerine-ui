@@ -15,9 +15,7 @@ import { Button } from '@patternfly/react-core';
 import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 
 const parseTitle = citation => {
-  const title = citation.metadata.title
-    ? citation.metadata.title
-    : citation.metadata.filename;
+  const title = citation.metadata?.title || citation.metadata?.title || citation.metadata?.filename || citation.metadata?.full_path || "Untitled Document";
   // Remove trailing / if present
   if (title.endsWith('\\')) {
     return title.slice(0, -1);
