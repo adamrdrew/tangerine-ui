@@ -150,7 +150,7 @@ export const AISearchComponent = () => {
       box-sizing: border-box; !important;/* Includes padding and border in height calculation */
       display: flex; !important;/* Flexbox to manage layout within the parent */
     }
-  
+
     [class*="cardBody-"] {
       max-height: 100% !important;
       height: 30px !important; /*This is black magic. It forces a correct height even though it looks wrong */
@@ -163,7 +163,7 @@ export const AISearchComponent = () => {
 
     .cardThemeBody {
       max-height: 100% !important;
-      height: 100% !important; 
+      height: 100% !important;
       box-sizing: border-box; !important;/* Includes padding and border in height calculation */
     }
   `;
@@ -433,9 +433,18 @@ export const AISearchComponent = () => {
                 onSendMessage={sendMessageHandler}
               >
                 <ConversationAlert title="Convo will search documentation and then synthesize and summarize an answer.">
-                  Convo is powered by a Large Language Model. Verify any
-                  information it provides before taking action. The sources used
-                  to construct your answer are listed in the citations.
+                  You are about to use a Red Hat
+                  AI-powered conversational search engine, which
+                  utilizes generative AI technology to provide you
+                  with relevant information. Please do not include
+                  any personal information in your queries. By
+                  proceeding to use the tool, you acknowledge that
+                  the tool and any output provided are only
+                  intended for internal use and that information
+                  should only be shared with those with a
+                  legitimate business purpose.  Responses provided
+                  by tools utilizing GAI technology should be
+                  reviewed and verified prior to use.
                 </ConversationAlert>
                 <Conversation conversation={conversation} />
                 <ShowLoadingMessage />
