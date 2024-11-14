@@ -24,9 +24,15 @@ const parseTitle = citation => {
 };
 
 const CitationContent = ({ citation, expanded }) => {
-  const makeLink = path => {
-    // return the path prepended by /docs/ if there is a /index.html at the end remove it
-    return `/docs/${path.replace(/\/index.html$/, '')}`;
+  const makeLink = metadata => {
+    if (metadata?.citation_url) {
+      return metadata.citation_url
+    } else {
+      // deprecated method, where full_path was used to construct citation url
+      // return the path prepended by /docs/
+      // if there is a /index.html at the end, remove it
+      return `/docs/${metadata.full_path.replace(/\/index.html$/, '')}`;
+    }
   };
 
   if (!expanded) {
@@ -40,7 +46,7 @@ const CitationContent = ({ citation, expanded }) => {
           icon={<ExternalLinkSquareAltIcon />}
           iconPosition="end"
           onClick={() => {
-            window.open(makeLink(citation.metadata.full_path), '_blank');
+            window.open(makeLink(citation.metadata), '_blank');
           }}
         >
           Read Citation Source
