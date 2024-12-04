@@ -48,7 +48,7 @@ proxy:
     '/tangerine':
       target: ${TANGERINE_CLUSTER_URL}
       headers:
-        Authorization: Bearer ${TANGERINE_CLUSTER_API_TOKEN}
+        Authorization: Bearer ${TANGERINE_TOKEN}
       allowedMethods: ['POST', 'GET']
       credentials: dangerously-allow-unauthenticated
 
