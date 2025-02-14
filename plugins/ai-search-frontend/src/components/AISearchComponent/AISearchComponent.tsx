@@ -1,55 +1,136 @@
 import React, { useEffect, useState } from 'react';
-import { useApi, configApiRef } from '@backstage/core-plugin-api';
-import { useTheme } from '@material-ui/core/styles';
-import VirtualAssistant from '@patternfly/virtual-assistant/dist/dynamic/VirtualAssistant';
-import ConversationAlert from '@patternfly/virtual-assistant/dist/esm/ConversationAlert';
-import AssistantMessageEntry from '@patternfly/virtual-assistant/dist/dynamic/AssistantMessageEntry';
-import UserMessageEntry from '@patternfly/virtual-assistant/dist/dynamic/UserMessageEntry';
-import LoadingMessage from '@patternfly/virtual-assistant/dist/esm/LoadingMessage';
-import SystemMessageEntry from '@patternfly/virtual-assistant/dist/esm/SystemMessageEntry';
-import { CommentsIcon } from '@patternfly/react-icons';
+import { useAsync } from 'react-use';
 import {
-  Grid,
-  GridItem,
-  Page,
-  PageSection,
-  PageSectionVariants,
-  Split,
-  SplitItem,
+  useApi,
+  identityApiRef,
+  configApiRef,
+} from '@backstage/core-plugin-api';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { Content, Page } from '@backstage/core-components';
+import Chatbot, {
+  ChatbotDisplayMode,
+} from '@patternfly/chatbot/dist/dynamic/Chatbot';
+import ChatbotWelcomePrompt from '@patternfly/chatbot/dist/dynamic/ChatbotWelcomePrompt';
+import ChatbotConversationHistoryNav from '@patternfly/chatbot/dist/dynamic/ChatbotConversationHistoryNav';
+import {
+  ChatbotHeader,
+  ChatbotHeaderMain,
+  ChatbotHeaderMenu,
+  ChatbotHeaderActions,
+  ChatbotHeaderTitle,
+  ChatbotHeaderOptionsDropdown,
+  ChatbotHeaderSelectorDropdown,
+} from '@patternfly/chatbot/dist/dynamic/ChatbotHeader';
+import {
+  Brand,
+  Bullseye,
+  Checkbox,
+  DropdownGroup,
+  DropdownItem,
+  DropdownList,
+  FormGroup,
+  Stack,
+} from '@patternfly/react-core';
+import MessageBox from '@patternfly/chatbot/dist/dynamic/MessageBox';
+import Message from '@patternfly/chatbot/dist/dynamic/Message';
+import ConvoAvatar from '../../../static/avatar.png';
+import { ChatbotFootnote } from '@patternfly/chatbot/dist/dynamic/ChatbotFooter';
+import UserAvatar from '../../../static/user.png';
+
+import { MessageBar } from '@patternfly/chatbot/dist/dynamic/MessageBar';
+import { ChatbotFooter } from '@patternfly/chatbot/dist/dynamic/ChatbotFooter';
+import Markdown from 'react-markdown'; // import react-markdown
+import {
   Title,
-  TitleSizes,
   FormSelect,
   FormSelectOption,
   Button,
 } from '@patternfly/react-core';
 import Citations from './Citations';
 
-import Markdown from 'markdown-to-jsx';
-
 // Style imports needed for the virtual assistant component
 import '@patternfly/react-core/dist/styles/base.css';
-import '@patternfly/react-styles';
-import '@patternfly/patternfly/patternfly-addons.css';
+import '@patternfly/chatbot/dist/css/main.css';
 
 const BOT = 'ai';
 const USER = 'human';
 
-const Conversation = ({ conversation }) => {
-  return conversation.map((conversationEntry, index) => {
+// CSS Overrides to make PF components look normal in Backstage
+const useStyles = makeStyles(theme => ({
+  prompt: {
+    'justify-content': 'flex-end',
+  },
+  messagebox: {
+    maxWidth: 'unset !important',
+    padding: '2em',
+  },
+  container: {
+    maxWidth: 'unset !important',
+    padding: '0px',
+  },
+  userMessageText: {
+    '& div.pf-chatbot__message--user': {
+      '& div.pf-chatbot__message-text': {
+        '& p': {
+          color: theme.palette.common.white,
+        },
+      },
+    },
+  },
+  header: {
+    padding: `${theme.spacing(3)}px !important`,
+  },
+  headerTitle: {
+    justifyContent: 'left !important',
+  },
+  footer: {
+    '&>.pf-chatbot__footer-container': {
+      width: '95% !important',
+      maxWidth: 'unset !important',
+    },
+  },
+}));
+
+const Conversation = ({ conversation }: { conversation: any }) => {
+  const transformCitationsToSources = (conversation_entry: any) => {
+    if (!conversation_entry.search_metadata) {
+      return { sources: [] };
+    }
+    const sources = conversation_entry.search_metadata.map((citation: any) => {
+      return {
+        title: citation.metadata.title,
+        link: citation.metadata.citation_url,
+        body: Markdown({ children: citation.page_content }),
+      };
+    });
+    return { sources };
+  };
+  return conversation.map((conversationEntry: any, index: number) => {
     if (conversationEntry.sender === USER) {
       return (
-        <UserMessageEntry key={index}>
-          <Markdown>{conversationEntry.text}</Markdown>
-        </UserMessageEntry>
+        <Message
+          key={index}
+          name="You"
+          role="user"
+          content={conversationEntry.text}
+          avatar={UserAvatar}
+        />
       );
     }
     if (conversationEntry.sender === BOT) {
       return (
         <React.Fragment key={index}>
-          <AssistantMessageEntry title="Convo">
-            <Markdown>{conversationEntry.text}</Markdown>
-          </AssistantMessageEntry>
-          <Citations conversationEntry={conversationEntry} />
+          <Message
+            name="Convo"
+            role="bot"
+            content={conversationEntry.text}
+            avatar={ConvoAvatar}
+            sources={
+              conversationEntry.search_metadata
+                ? transformCitationsToSources(conversationEntry)
+                : undefined
+            }
+          />
         </React.Fragment>
       );
     }
@@ -59,13 +140,20 @@ const Conversation = ({ conversation }) => {
 
 export const AISearchComponent = () => {
   // Constants
+  const classes = useStyles();
   const config = useApi(configApiRef);
   const backendUrl = config.getString('backend.baseUrl');
   const theme = useTheme();
   const isDarkMode = theme.palette.type === 'dark';
 
+  const identityApi = useApi(identityApiRef);
+  const { value: profile, loading: profileLoading } = useAsync(
+    async () => await identityApi.getProfileInfo(),
+  );
+
   // State
-  const [userInputMessage, setUserInputMessage] = useState<string>('');
+  const [_userInputMessage, setUserInputMessage] = useState<string>('');
+  const [conversationList, setConversationList] = useState<any>([]);
   const [conversation, setConversation] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
@@ -74,16 +162,30 @@ export const AISearchComponent = () => {
   const [responseIsStreaming, setResponseIsStreaming] =
     useState<boolean>(false);
 
-  // Side Effects
+  const welcomePrompts = [
+    {
+      title: 'Learn about Incident Response',
+      message: 'What is our incident response process?',
+      onClick: () => {
+        sendMessageHandler('What is our incident response process?');
+      },
+    },
+    {
+      title: 'Get up to speed on Konflux',
+      message: 'Give me a general overview of Konflux.',
+      onClick: () => {
+        sendMessageHandler('Give me a general overview of Konflux.');
+      },
+    },
+  ];
 
-  // On component mount get the agents and modify the PF card style
+  // Side Effects
   useEffect(() => {
+    if (agents.length !== 0) {
+      return;
+    }
     getAgents();
-    modifyPFCardStyle();
-    return () => {
-      removeCustomStyles();
-    };
-  }, []);
+  }, [agents]);
 
   // Whenever the conversation changes,
   // If the last message in the conversation is from the user and the bot is not typing, send the user query
@@ -132,50 +234,6 @@ export const AISearchComponent = () => {
         setResponseIsStreaming(false);
         console.error(`Error fetching agents from backend`);
       });
-  };
-
-  // This is pretty scary
-  // I need to override some of the patternfly styles because the virtual assistant component is not responsive
-  // It has a fixed size and that doesn't work for us
-  const modifyPFCardStyle = () => {
-    const style = document.createElement('style');
-    style.id = 'ai-search-styles';
-    style.innerHTML = `
-    [class*="card-"] {
-      height: 100% !important;
-      max-height: 100% !important; /* Ensures the element doesn't grow beyond the parent's height */
-      width: 100% !important;
-      border-radius: 0 !important;
-      overflow: hidden !important; /* Prevents overflow if content grows */
-      box-sizing: border-box; !important;/* Includes padding and border in height calculation */
-      display: flex; !important;/* Flexbox to manage layout within the parent */
-    }
-
-    [class*="cardBody-"] {
-      max-height: 100% !important;
-      height: 30px !important; /*This is black magic. It forces a correct height even though it looks wrong */
-      box-sizing: border-box; !important;/* Includes padding and border in height calculation */
-    }
-
-    [class*="cardHeader-"] {
-      display: none !important;
-    }
-
-    .cardThemeBody {
-      max-height: 100% !important;
-      height: 100% !important;
-      box-sizing: border-box; !important;/* Includes padding and border in height calculation */
-    }
-  `;
-    // Append the style element to the document head
-    document.head.appendChild(style);
-  };
-
-  const removeCustomStyles = () => {
-    const style = document.getElementById('ai-search-styles');
-    if (style) {
-      style.remove();
-    }
   };
 
   const sendUserQuery = async (agentId: number, userQuery: any) => {
@@ -257,7 +315,7 @@ export const AISearchComponent = () => {
           break;
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(`Error processing stream: ${error.message}`);
     }
   };
@@ -273,7 +331,7 @@ export const AISearchComponent = () => {
           updateConversation(text_content, search_metadata);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(`Failed to process chunk: ${error.message}`);
     }
   };
@@ -328,7 +386,7 @@ export const AISearchComponent = () => {
 
   const ShowLoadingMessage = () => {
     if (loading) {
-      return <LoadingMessage />;
+      return <div>Loading...</div>;
     }
     return null;
   };
@@ -336,9 +394,9 @@ export const AISearchComponent = () => {
   const ShowErrorMessage = () => {
     if (error) {
       return (
-        <SystemMessageEntry>
+        <Content>
           😿 Something went wrong talking Convo's brain. Try back later.
-        </SystemMessageEntry>
+        </Content>
       );
     }
     return null;
@@ -346,23 +404,21 @@ export const AISearchComponent = () => {
 
   const AgentSelect = () => {
     return (
-      <FormSelect
-        id="select-agent"
-        aria-label="Agent Selector"
-        value={selectedAgent.id}
-        onChange={(_event, selection) => {
-          const agent = agents.find(agent => agent.id === parseInt(selection));
+      <ChatbotHeaderSelectorDropdown
+        value={selectedAgent.agent_name}
+        onSelect={(_event, selection) => {
+          const agent = agents.find(agent => agent.id === selection);
           setSelectedAgent(agent);
         }}
       >
-        {agents.map((agent, index) => (
-          <FormSelectOption
-            key={index}
-            value={agent.id}
-            label={agent.agent_name + '       '}
-          />
-        ))}
-      </FormSelect>
+        <DropdownList>
+          {agents.map((agent, index) => (
+            <DropdownItem value={agent.id} key={agent.id}>
+              {agent.agent_name}
+            </DropdownItem>
+          ))}
+        </DropdownList>
+      </ChatbotHeaderSelectorDropdown>
     );
   };
 
@@ -378,83 +434,85 @@ export const AISearchComponent = () => {
     );
   };
 
-  const HeaderToolBar = () => {
-    return (
-      <PageSection
-        style={{ backgroundColor: '#EE0000' }}
-        variant={
-          isDarkMode ? PageSectionVariants.dark : PageSectionVariants.darker
-        }
-      >
-        <Split hasGutter>
-          <SplitItem>
-            <Title headingLevel="h1" size={TitleSizes['3xl']}>
-              Convo
-            </Title>
-          </SplitItem>
-          <SplitItem isFilled />
-          <SplitItem>
-            <AgentSelect />
-          </SplitItem>
-          <SplitItem>
-            <NewChatButton />
-          </SplitItem>
-        </Split>
-      </PageSection>
-    );
-  };
+  const [drawerIsOpen, setDrawerIsOpen] = useState(false);
 
   return (
-    <Page>
-      <HeaderToolBar />
-      <PageSection
-        padding={{ default: 'noPadding' }}
-        variant={
-          isDarkMode ? PageSectionVariants.darker : PageSectionVariants.light
-        }
-      >
-        <div
-          class={
-            isDarkMode ? 'pf-v5-theme-dark cardThemeBody' : 'cardThemeBody'
-          }
-        >
-          <Grid style={{ height: '100%' }}>
-            <GridItem span={2} rowSpan={12}></GridItem>
-            <GridItem span={8} rowSpan={12}>
-              <VirtualAssistant
-                icon={CommentsIcon}
-                title="Convo"
-                inputPlaceholder="What can Convo help you with?"
-                message={userInputMessage}
-                isSendButtonDisabled={loading || responseIsStreaming}
-                onChangeMessage={(_event, value) => {
-                  setUserInputMessage(value);
-                }}
-                onSendMessage={sendMessageHandler}
-              >
-                <ConversationAlert title="Convo will search documentation and then synthesize and summarize an answer.">
-                  You are about to use a Red Hat
-                  AI-powered conversational search engine, which
-                  utilizes generative AI technology to provide you
-                  with relevant information. Please do not include
-                  any personal information in your queries. By
-                  proceeding to use the tool, you acknowledge that
-                  the tool and any output provided are only
-                  intended for internal use and that information
-                  should only be shared with those with a
-                  legitimate business purpose.  Responses provided
-                  by tools utilizing GAI technology should be
-                  reviewed and verified prior to use.
-                </ConversationAlert>
-                <Conversation conversation={conversation} />
-                <ShowLoadingMessage />
-                <ShowErrorMessage />
-              </VirtualAssistant>
-            </GridItem>
-            <GridItem span={2} rowSpan={12}></GridItem>
-          </Grid>
-        </div>
-      </PageSection>
+    <Page themeId="tool">
+      <Content className={classes.container}>
+        <Chatbot displayMode={ChatbotDisplayMode.embedded}>
+          <ChatbotConversationHistoryNav
+            conversations={[]}
+            onDrawerToggle={() => {setDrawerIsOpen(!drawerIsOpen)}}
+            isDrawerOpen={drawerIsOpen}
+            setIsDrawerOpen={() => {setDrawerIsOpen(false)}}
+            displayMode={ChatbotDisplayMode.embedded}
+            onNewChat={() => {
+              setConversation([]);
+            }}
+            drawerContent={
+              <React.Fragment>
+                <ChatbotHeader>
+                  <ChatbotHeaderMain>
+                    {/*
+                    When we are ready to add a menu, uncomment this
+                    <ChatbotHeaderMenu onMenuToggle={() => {setDrawerIsOpen(!drawerIsOpen)}} />
+                    */}
+                    <ChatbotHeaderTitle className={classes.headerTitle}>
+                      <Title headingLevel="h1" size="3xl">
+                        Convo
+                      </Title>
+                    </ChatbotHeaderTitle>
+                  </ChatbotHeaderMain>
+                  <ChatbotHeaderActions>
+                    <NewChatButton />
+                    <AgentSelect />
+                  </ChatbotHeaderActions>
+                </ChatbotHeader>
+
+                <MessageBox
+                  className={`${classes.messagebox} ${classes.userMessageText} `}
+                  style={{ justifyContent: 'flex-end' }}
+                  announcement="Type your message and hit enter to send"
+                >
+                  {conversation.length === 0 && (
+                    <ChatbotWelcomePrompt
+                      title={`Hi ${profile?.displayName || 'there'}!`}
+                      description="What would you like to know?"
+                      prompts={welcomePrompts}
+                    />
+                  )}
+                  <Conversation conversation={conversation} />
+
+                  <ShowLoadingMessage />
+                  <ShowErrorMessage />
+                </MessageBox>
+                <ChatbotFooter>
+                  <MessageBar
+                    onSendMessage={sendMessageHandler}
+                    hasAttachButton={false}
+                    isSendButtonDisabled={responseIsStreaming}
+                  />
+                  <ChatbotFootnote
+                    label="Convo uses AI. Check for mistakes."
+                    popover={{
+                      title: 'Verify accuracy',
+                      description: `You are about to use a Red Hat AI-powered conversational search
+              engine, which utilizes generative AI technology to provide you
+              with relevant information. Please do not include any personal
+              information in your queries. By proceeding to use the tool, you
+              acknowledge that the tool and any output provided are only
+              intended for internal use and that information should only be
+              shared with those with a legitimate business purpose. Responses
+              provided by tools utilizing GAI technology should be reviewed and
+              verified prior to use.`,
+                    }}
+                  ></ChatbotFootnote>
+                </ChatbotFooter>
+              </React.Fragment>
+            }
+          />
+        </Chatbot>
+      </Content>
     </Page>
   );
 };
