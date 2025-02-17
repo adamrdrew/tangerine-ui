@@ -6,7 +6,8 @@ export const AgentSelect: React.FC<{
   agents: any[];
   onAgentSelect: (agent: any) => void;
   selectedAgent: any;
-}> = ({ agents, onAgentSelect, selectedAgent }) => {
+  className: string;
+}> = ({ agents, onAgentSelect, selectedAgent, className }) => {
   const [agentsCount, setAgentsCount] = useState(agents.length);
 
   useEffect(() => {
@@ -18,20 +19,22 @@ export const AgentSelect: React.FC<{
   }
 
   return (
-    <ChatbotHeaderSelectorDropdown
-      value={selectedAgent.agent_name}
-      onSelect={(_event, selection) => {
-        const agent = agents.find((agent: any) => agent.id === selection);
-        onAgentSelect(agent);
-      }}
-    >
-      <DropdownList>
-        {agents.map((agent, _index) => (
-          <DropdownItem value={agent.id} key={agent.id}>
-            {agent.agent_name}
-          </DropdownItem>
-        ))}
-      </DropdownList>
-    </ChatbotHeaderSelectorDropdown>
+    <div className={className}>
+      <ChatbotHeaderSelectorDropdown
+        value={selectedAgent.agent_name}
+        onSelect={(_event, selection) => {
+          const agent = agents.find((agent: any) => agent.id === selection);
+          onAgentSelect(agent);
+        }}
+      >
+        <DropdownList className={className}>
+          {agents.map((agent, _index) => (
+            <DropdownItem value={agent.id} key={agent.id}>
+              {agent.agent_name}
+            </DropdownItem>
+          ))}
+        </DropdownList>
+      </ChatbotHeaderSelectorDropdown>
+    </div>
   );
 };

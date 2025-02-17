@@ -12,12 +12,8 @@ import { Title, Button } from '@patternfly/react-core';
 
 import { AgentSelect } from './AgentSelect';
 
-// CSS Overrides to make PF components look normal in Backstage
-const useStyles = makeStyles(_theme => ({
-  headerTitle: {
-    justifyContent: 'left !important',
-  },
-}));
+import { customStyles } from '../../lib/styles';
+import { useTheme } from '@material-ui/core/styles';
 
 export const ConvoHeader: React.FC<{
   onAgentSelect: (agent: any) => void;
@@ -25,12 +21,15 @@ export const ConvoHeader: React.FC<{
   agents: any[];
   selectedAgent: any;
 }> = ({ onAgentSelect, onNewChatClick, agents, selectedAgent }) => {
+  // CSS Overrides to make PF components look normal in Backstage
+  const theme = useTheme();
+  const useStyles = makeStyles(_theme => customStyles(theme));
   const classes = useStyles();
 
   return (
-    <ChatbotHeader>
+    <ChatbotHeader className={classes.header}>
       <ChatbotHeaderMain>
-        <ChatbotHeaderTitle className={classes.headerTitle}>
+        <ChatbotHeaderTitle className={classes.headerTitle} >
           <Title headingLevel="h1" size="3xl">
             Convo
           </Title>
@@ -38,6 +37,7 @@ export const ConvoHeader: React.FC<{
       </ChatbotHeaderMain>
       <ChatbotHeaderActions>
         <Button
+          className={classes.redHatRedBGColor}
           onClick={() => {
             onNewChatClick([]);
           }}
@@ -48,6 +48,7 @@ export const ConvoHeader: React.FC<{
           agents={agents}
           onAgentSelect={onAgentSelect}
           selectedAgent={selectedAgent}
+          className={classes.agentMenu}
         />
       </ChatbotHeaderActions>
     </ChatbotHeader>
