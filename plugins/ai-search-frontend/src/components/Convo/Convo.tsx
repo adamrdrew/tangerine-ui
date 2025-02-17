@@ -44,6 +44,22 @@ export const Convo = () => {
   const [responseIsStreaming, setResponseIsStreaming] =
     useState<boolean>(false);
 
+
+    useEffect(() => {
+      const handleLinkClick = (event) => {
+        const link = event.target.closest('a'); // Matches any <a> element
+        if (link) {
+          event.preventDefault();
+          window.open(link.href, '_blank', 'noopener,noreferrer');
+        }
+      };
+    
+      document.addEventListener('click', handleLinkClick);
+      return () => {
+        document.removeEventListener('click', handleLinkClick);
+      };
+    }, []);
+
   useEffect(() => {
     const currentTheme = theme.palette.type;
     setIsDarkMode(currentTheme === 'dark');
