@@ -5,18 +5,18 @@ import {
 
 import { rootRouteRef } from './routes';
 
-export const aiSearchFrontendPlugin = createPlugin({
-  id: 'ai-search-frontend',
+export const convoFrontendPlugin = createPlugin({
+  id: 'convo-frontend',
   routes: {
     root: rootRouteRef,
   },
 });
 
-export const AISearchFrontendPage = aiSearchFrontendPlugin.provide(
+export const ConvoFrontendPage = convoFrontendPlugin.provide(
   createRoutableExtension({
-    name: 'AISearchFrontendPage',
+    name: 'ConvoFrontendPage',
     component: () =>
-      import('./components/AISearchComponent').then(m => m.AISearchComponent),
+      import('./components/Convo').then(m => m.Convo),
     mountPoint: rootRouteRef,
   }),
 );

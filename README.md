@@ -40,13 +40,13 @@ proxy:
 
 Add this to the dynmaic plugins config file
 ```yaml
-    - package: "https://github.com/RedHatInsights/backstage-plugin-ai-search-frontend/releases/download/v0.2.9/redhatinsights-backstage-plugin-ai-search-frontend-dynamic-0.2.9.tgz"
+    - package: "https://github.com/RedHatInsights/backstage-plugin-convo-frontend/releases/download/v0.2.9/redhatinsights-backstage-plugin-convo-frontend-dynamic-0.2.9.tgz"
       disabled: false
       integrity: "sha256-2lwrT6OIXWCaNFsR+Ns6T5MDWRmYUSGW8VpyeWwPLtU="
       pluginConfig:
         dynamicPlugins:
           frontend:
-            redhatinsights.backstage-plugin-ai-search-frontend:
+            redhatinsights.backstage-plugin-convo-frontend:
               dynamicRoutes:
                 - path: /convo
                   importName: AISearchFrontendPage

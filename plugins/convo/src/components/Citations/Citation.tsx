@@ -5,7 +5,7 @@ import {
   AccordionContent,
   CardTitle,
   CardBody,
-  TextContent,
+  Content,
   Card,
 } from '@patternfly/react-core';
 
@@ -54,11 +54,11 @@ const CitationContent = ({ citation, expanded }) => {
             window.open(makeLink(citation.metadata), '_blank');
           }}
         >
-          Read Citation Source
+          Read Source Document
         </Button>
       </CardTitle>
       <CardBody>
-        <TextContent>
+        <Content>
           <Markdown
             style={{ marginLeft: '1em' }}
             options={{
@@ -75,7 +75,7 @@ const CitationContent = ({ citation, expanded }) => {
           >
             {citation.page_content}
           </Markdown>
-        </TextContent>
+        </Content>
       </CardBody>
     </Card>
   );
@@ -87,6 +87,7 @@ const Citation = ({ citation }) => {
   return (
     <AccordionItem>
       <AccordionToggle
+        id="toggle1"
         onClick={() => setExpanded(!expanded)}
         isExpanded={expanded}
       >
