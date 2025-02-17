@@ -1,1 +1,1 @@
-export { aiSearchFrontendPlugin, AISearchFrontendPage } from './plugin';
+export { convoFrontendPlugin, ConvoFrontendPage } from './plugin';
