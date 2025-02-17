@@ -1,12 +1,12 @@
 #!/bin/bash
 
 rm *.tgz
-yarn workspace @redhatinsights/backstage-plugin-ai-search-frontend export-dynamic
-cd plugins/ai-search-frontend/
+yarn workspace @redhatinsights/backstage-plugin-convo-frontend export-dynamic
+cd plugins/convo/
 rm *.tgz
 npm pack ./dist-dynamic
 cd ../..
-mv plugins/ai-search-frontend/*.tgz .
+mv plugins/convo/*.tgz .
 
 # Check if sha256sum is installed
 if command -v sha256sum &> /dev/null
