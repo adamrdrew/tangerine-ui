@@ -66,7 +66,7 @@ export const sendUserQuery = async (
         setResponseIsStreaming,
         updateConversation,
       );
-    } catch (error) {
+    } catch (error: any) {
       handleError(error);
     }
   };

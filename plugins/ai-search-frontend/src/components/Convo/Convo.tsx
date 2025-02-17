@@ -32,7 +32,6 @@ export const Convo = () => {
   const config = useApi(configApiRef);
   const backendUrl = config.getString('backend.baseUrl');
   const theme = useTheme();
-  const isDarkMode = theme.palette.type === 'dark';
 
   // State
   const [_userInputMessage, setUserInputMessage] = useState<string>('');
@@ -41,10 +40,25 @@ export const Convo = () => {
   const [error, setError] = useState<boolean>(false);
   const [agents, setAgents] = useState<any>([]);
   const [selectedAgent, setSelectedAgent] = useState<any>({});
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [responseIsStreaming, setResponseIsStreaming] =
     useState<boolean>(false);
 
-  // Side Effects
+  useEffect(() => {
+    const currentTheme = theme.palette.type;
+    setIsDarkMode(currentTheme === 'dark');
+  }, [theme]);
+
+  React.useEffect(() => {
+    const htmlTagElement = document.documentElement;
+    const THEME_DARK_CLASS = 'pf-v6-theme-dark';
+    if (isDarkMode) {
+      htmlTagElement.classList.add(THEME_DARK_CLASS);
+    } else {
+      htmlTagElement.classList.remove(THEME_DARK_CLASS);
+    }
+  }, [isDarkMode]);
+
   useEffect(() => {
     if (agents.length !== 0) {
       return;
@@ -89,7 +103,6 @@ export const Convo = () => {
       setUserInputMessage('');
     }
   }, [loading]);
-
 
   const updateConversation = (text_content: string, search_metadata: any) => {
     setConversation(prevMessages => {
