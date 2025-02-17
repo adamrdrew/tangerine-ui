@@ -104,6 +104,14 @@ export const Convo = () => {
     }
   }, [loading]);
 
+  // If the conversation changes, scroll to the bottom of the message box
+  useEffect(() => {
+    const messageBox = document.querySelector('.pf-chatbot__messagebox');
+    if (messageBox) {
+      messageBox.scrollTo({ top: messageBox.scrollHeight, behavior: 'smooth' });
+    }
+  }, [conversation.length]); // Assuming messages is your chat log
+
   const updateConversation = (text_content: string, search_metadata: any) => {
     setConversation(prevMessages => {
       const lastMessage = prevMessages[prevMessages.length - 1];
