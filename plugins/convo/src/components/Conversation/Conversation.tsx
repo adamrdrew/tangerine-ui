@@ -5,8 +5,6 @@ import UserAvatar from '../../../static/user.svg';
 import { humanizeAgentName } from '../../lib/helpers';
 import { CitationsCard } from '../Citations/CitationsCard';
 
-import Markdown from 'react-markdown'; // import react-markdown
-
 const BOT = 'ai';
 const USER = 'human';
 
@@ -14,20 +12,6 @@ export const Conversation: React.FC<{ conversation: any; agent: any }> = ({
   conversation,
   agent,
 }) => {
-  const transformCitationsToSources = (conversation_entry: any) => {
-    if (!conversation_entry.search_metadata) {
-      return { sources: [] };
-    }
-    const sources = conversation_entry.search_metadata.map((citation: any) => {
-      return {
-        title: citation.metadata.title,
-        link: citation.metadata.citation_url,
-        body: Markdown({ children: citation.page_content }),
-      };
-    });
-    return { sources };
-  };
-
   const renderUserMessage = (conversationEntry: any, id: number) => {
     if (conversationEntry.hidden) {
       return null;
@@ -56,9 +40,7 @@ export const Conversation: React.FC<{ conversation: any; agent: any }> = ({
             content={conversationEntry.text}
             avatar={ConvoAvatar}
           />
-          <CitationsCard
-            citations={conversationEntry?.search_metadata}
-          />
+          <CitationsCard citations={conversationEntry?.search_metadata} />
         </React.Fragment>
       );
     }

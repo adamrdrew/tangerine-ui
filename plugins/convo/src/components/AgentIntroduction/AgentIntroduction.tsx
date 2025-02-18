@@ -33,6 +33,7 @@ export const AgentIntroduction: React.FC<{
   const [llmResponse, setLlmResponse] = React.useState<string>('👋');
   const [newToken, setNewToken] = React.useState<string>('');
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<boolean>(false);
 
   const noop = () => {};
 
@@ -55,6 +56,7 @@ export const AgentIntroduction: React.FC<{
   }, [newToken]);
 
   const handleAgentIntroduction = async () => {
+    setError(false);
     try {
       await sendUserQuery(
         backendUrl,
@@ -69,8 +71,17 @@ export const AgentIntroduction: React.FC<{
       );
     } catch (error) {
       console.error('Error fetching agent introduction:', error);
+      setError(true);
     }
   };
+
+  if (error) {
+    return (
+      <section>
+        <b>Something went wrong talking to the server.</b>
+      </section>
+    );
+  }
 
   return (
     <AgentIntroductionMessage

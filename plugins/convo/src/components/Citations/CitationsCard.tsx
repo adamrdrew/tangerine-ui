@@ -13,7 +13,9 @@ import {
 import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 import Markdown from 'markdown-to-jsx';
 
-export const CitationsCard = ({ citations }) => {
+export const CitationsCard: React.FC<{ citations: any[] }> = ({
+  citations,
+}) => {
   if (!citations || citations.length === 0) {
     return null;
   }
@@ -29,10 +31,10 @@ export const CitationsCard = ({ citations }) => {
     citations[currentCitationIndex]?.metadata?.citation_url || '';
 
   return (
-    <section style={{ marginTop: '-40px', marginBottom: '48px',  marginLeft: '4.7em' }}>
-      <div className="pf-v6-c-content">
-        {citations?.length} sources
-      </div>
+    <section
+      style={{ marginTop: '-40px', marginBottom: '48px', marginLeft: '4.7em' }}
+    >
+      <div className="pf-v6-c-content">{citations?.length} sources</div>
       <Card style={{ maxWidth: '33%' }} isCompact>
         <CardTitle style={{ position: 'relative' }}>
           <Button
