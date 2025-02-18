@@ -37,7 +37,7 @@ export const Convo = () => {
 
   // State
   const [_userInputMessage, setUserInputMessage] = useState<string>('');
-  const [conversation, setConversation] = useState([]);
+  const [conversation, setConversation] = useState([])
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [agents, setAgents] = useState<any>([]);
@@ -207,7 +207,7 @@ export const Convo = () => {
     setShowAgentIntroduction(true);
   };
 
-  const handleNewChatClick = (conversation) => {
+  const handleNewChatClick = (conversation:any) => {
     setConversation(conversation);
     setError(false);
     setLoading(false);
