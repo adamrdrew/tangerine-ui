@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <clipPath id="_clip1">
+        <rect id="_Image1_" serif:id="_Image1" x="0" y="0" width="32" height="32"/>
+    </clipPath>
+    <g clip-path="url(#_clip1)">
+        <use xlink:href="#_Image2" x="0" y="0" width="32px" height="32px"/>
+    </g>
+    <g transform="matrix(0.777778,0,0,0.777778,3.55556,3.72222)">
+        <path d="M25,6L17,6L17,2C17,1.451 16.549,1 16,1C15.451,1 15,1.451 15,2L15,6L7,6C4.806,6 3,7.806 3,10L3,24C3,26.194 4.806,28 7,28L25,28C27.194,28 29,26.194 29,24L29,10C29,7.806 27.194,6 25,6ZM27,24C27,25.097 26.097,26 25,26L7,26C5.903,26 5,25.097 5,24L5,10C5,8.903 5.903,8 7,8L25,8C26.097,8 27,8.903 27,10L27,24ZM20.5,17L11.5,17C9.58,17 8,18.58 8,20.5C8,22.42 9.58,24 11.5,24L20.5,24C22.42,24 24,22.42 24,20.5C24,18.58 22.42,17 20.5,17ZM17.5,19L17.5,22L14.5,22L14.5,19L17.5,19ZM10,20.5C10,19.677 10.677,19 11.5,19L12.5,19L12.5,22L11.5,22C10.677,22 10,21.323 10,20.5ZM20.5,22L19.5,22L19.5,19L20.5,19C21.323,19 22,19.677 22,20.5C22,21.323 21.323,22 20.5,22ZM9,13.5C9,12.677 9.677,12 10.5,12C11.323,12 12,12.677 12,13.5C12,14.323 11.323,15 10.5,15C9.677,15 9,14.323 9,13.5ZM20,13.5C20,12.677 20.677,12 21.5,12C22.323,12 23,12.677 23,13.5C23,14.323 22.323,15 21.5,15C20.677,15 20,14.323 20,13.5Z" style="fill-rule:nonzero;"/>
+    </g>
+    <defs>
+        <image id="_Image2" width="32px" height="32px" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAMklEQVRYhe3OQREAMAgEsaP+VeKDoTL4ZA1saro3h73LOQAAAAAAAAAAAAAAAAAAQJJ8hl8EAJGXs1cAAAAASUVORK5CYII="/>
+    </defs>
+</svg>

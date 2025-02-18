@@ -14,7 +14,9 @@ export const getAgents = (
   fetch(`${backendUrl}/api/proxy/tangerine/api/agents`, requestOptions)
     .then(response => response.json())
     .then(response => {
-      setAgents(response.data);
+      setAgents(
+        response.data.sort((a, b) => a.agent_name.localeCompare(b.agent_name))
+      );
       // HACK: Look for an agent named "'inscope-all-docs-agent'" and select it by default
       // if it isn't there just use the first agent
       const allDocsAgent = response.data.find(
@@ -35,41 +37,41 @@ export const getAgents = (
 };
 
 export const sendUserQuery = async (
-    backendUrl: string,
-    agentId: number,
-    userQuery: any,
-    previousMessages: any,
-    setLoading: (loading: boolean) => void,
-    setError: (error: boolean) => void,
-    setResponseIsStreaming: (streaming: boolean) => void,
-    handleError: (error: Error) => void,
-    updateConversation: (text_content: string, search_metadata: any) => void,
-  ) => {
-    try {
-      setLoading(true);
-      setError(false);
-      setResponseIsStreaming(false);
-  
-      if (userQuery === '') return;
-  
-      const response = await sendQueryToServer(
-        agentId,
-        userQuery,
-        backendUrl,
-        previousMessages,
-      );
-      const reader = createStreamReader(response);
-  
-      await processStream(
-        reader,
-        setLoading,
-        setResponseIsStreaming,
-        updateConversation,
-      );
-    } catch (error: any) {
-      handleError(error);
-    }
-  };
+  backendUrl: string,
+  agentId: number,
+  userQuery: any,
+  previousMessages: any,
+  setLoading: (loading: boolean) => void,
+  setError: (error: boolean) => void,
+  setResponseIsStreaming: (streaming: boolean) => void,
+  handleError: (error: Error) => void,
+  updateConversation: (text_content: string, search_metadata: any) => void,
+) => {
+  try {
+    setLoading(true);
+    setError(false);
+    setResponseIsStreaming(false);
+
+    if (userQuery === '') return;
+
+    const response = await sendQueryToServer(
+      agentId,
+      userQuery,
+      backendUrl,
+      previousMessages,
+    );
+    const reader = createStreamReader(response);
+
+    await processStream(
+      reader,
+      setLoading,
+      setResponseIsStreaming,
+      updateConversation,
+    );
+  } catch (error: any) {
+    handleError(error);
+  }
+};
 
 // Private functions
 const sendQueryToServer = async (
@@ -159,5 +161,3 @@ const processStream = async (
     console.log(`Error processing stream: ${error.message}`);
   }
 };
-
-

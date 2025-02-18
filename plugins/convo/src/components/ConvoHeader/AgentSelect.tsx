@@ -18,10 +18,17 @@ export const AgentSelect: React.FC<{
     return null;
   }
 
+  const humanizeAgentName = (name: string) => {
+    const words = name.split('-');
+    return words
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
   return (
     <div className={className}>
       <ChatbotHeaderSelectorDropdown
-        value={selectedAgent.agent_name}
+        value={humanizeAgentName(selectedAgent.agent_name)}
         onSelect={(_event, selection) => {
           const agent = agents.find((agent: any) => agent.id === selection);
           onAgentSelect(agent);
@@ -30,7 +37,7 @@ export const AgentSelect: React.FC<{
         <DropdownList className={className}>
           {agents.map((agent, _index) => (
             <DropdownItem value={agent.id} key={agent.id}>
-              {agent.agent_name}
+              {humanizeAgentName(agent.agent_name)}
             </DropdownItem>
           ))}
         </DropdownList>
