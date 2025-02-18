@@ -7,9 +7,9 @@ import { makeStyles, useTheme } from '@material-ui/core';
 import { customStyles } from '../../lib/styles';
 
 export const WelcomeMessages: React.FC<{
-  conversation: any[];
+  show: boolean;
   sendMessageHandler: (param: string) => void;
-}> = ({ conversation, sendMessageHandler }) => {
+}> = ({ show, sendMessageHandler }) => {
   const [welcomePrompts, setWelcomePrompts] = useState<any>([]);
   const identityApi = useApi(identityApiRef);
 
@@ -23,10 +23,10 @@ export const WelcomeMessages: React.FC<{
   );
 
   useEffect(() => {
-    if (conversation.length === 0) {
+    if (!show) {
       setWelcomePrompts([]);
     }
-  }, [conversation]);
+  }, [show]);
 
   useEffect(() => {
     if (welcomePrompts.length > 0) {
@@ -35,7 +35,7 @@ export const WelcomeMessages: React.FC<{
     setWelcomePrompts(getWelcomePrompts(sendMessageHandler));
   }, [welcomePrompts]);
 
-  if (conversation.length === 0 && welcomePrompts.length > 0) {
+  if (show && welcomePrompts.length > 0) {
     return (
       <ChatbotWelcomePrompt
         title={`Hi ${profile?.displayName || 'there'}!`}

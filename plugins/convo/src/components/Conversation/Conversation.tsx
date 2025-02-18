@@ -2,14 +2,16 @@ import React from 'react';
 import Message from '@patternfly/chatbot/dist/dynamic/Message';
 import ConvoAvatar from '../../../static/robot.svg';
 import UserAvatar from '../../../static/user.svg';
+import { humanizeAgentName } from '../../lib/helpers';
 
 import Markdown from 'react-markdown'; // import react-markdown
 
 const BOT = 'ai';
 const USER = 'human';
 
-export const Conversation: React.FC<{ conversation: any }> = ({
+export const Conversation: React.FC<{ conversation: any, agent: any }> = ({
   conversation,
+  agent
 }) => {
   const transformCitationsToSources = (conversation_entry: any) => {
     if (!conversation_entry.search_metadata) {
@@ -26,6 +28,9 @@ export const Conversation: React.FC<{ conversation: any }> = ({
   };
 
   const renderUserMessage = (conversationEntry: any, id: number) => {
+    if ( conversationEntry.hidden ) {
+      return null;
+    }
     if (conversationEntry.sender === USER) {
       return (
         <Message
@@ -44,7 +49,7 @@ export const Conversation: React.FC<{ conversation: any }> = ({
       return (
         <Message
           key={id}
-          name="Convo"
+          name={`${humanizeAgentName(agent.agent_name)} Assistant`}
           role="bot"
           content={conversationEntry.text}
           avatar={ConvoAvatar}
@@ -55,8 +60,8 @@ export const Conversation: React.FC<{ conversation: any }> = ({
           }
         />
       );
-      return null;
     }
+    return null;
   };
 
   return conversation.map((conversationEntry: any, index: number) => {

@@ -5,6 +5,8 @@ app:
 organization:
   name: My Company
 
+dangerouslyAllowUnverifiedAuth: true
+
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
   # See https://backstage.io/docs/auth/service-to-service-auth for
@@ -77,8 +79,6 @@ auth:
     # See https://backstage.io/docs/auth/guest/provider
     guest: {}
 
-scaffolder:
-  # see https://backstage.io/docs/features/software-templates/configuration for software template options
 
 catalog:
   import:
