@@ -3,32 +3,17 @@ import Message from '@patternfly/chatbot/dist/dynamic/Message';
 import ConvoAvatar from '../../../static/robot.svg';
 import UserAvatar from '../../../static/user.svg';
 import { humanizeAgentName } from '../../lib/helpers';
-
-import Markdown from 'react-markdown'; // import react-markdown
+import { CitationsCard } from '../Citations/CitationsCard';
 
 const BOT = 'ai';
 const USER = 'human';
 
-export const Conversation: React.FC<{ conversation: any, agent: any }> = ({
+export const Conversation: React.FC<{ conversation: any; agent: any }> = ({
   conversation,
-  agent
+  agent,
 }) => {
-  const transformCitationsToSources = (conversation_entry: any) => {
-    if (!conversation_entry.search_metadata) {
-      return { sources: [] };
-    }
-    const sources = conversation_entry.search_metadata.map((citation: any) => {
-      return {
-        title: citation.metadata.title,
-        link: citation.metadata.citation_url,
-        body: Markdown({ children: citation.page_content }),
-      };
-    });
-    return { sources };
-  };
-
   const renderUserMessage = (conversationEntry: any, id: number) => {
-    if ( conversationEntry.hidden ) {
+    if (conversationEntry.hidden) {
       return null;
     }
     if (conversationEntry.sender === USER) {
@@ -47,18 +32,16 @@ export const Conversation: React.FC<{ conversation: any, agent: any }> = ({
   const renderBotMessage = (conversationEntry: any, id: number) => {
     if (conversationEntry.sender === BOT) {
       return (
-        <Message
-          key={id}
-          name={`${humanizeAgentName(agent.agent_name)} Assistant`}
-          role="bot"
-          content={conversationEntry.text}
-          avatar={ConvoAvatar}
-          sources={
-            conversationEntry.search_metadata
-              ? transformCitationsToSources(conversationEntry)
-              : undefined
-          }
-        />
+        <React.Fragment key={id}>
+          <Message
+            key={id}
+            name={`${humanizeAgentName(agent.agent_name)} Assistant`}
+            role="bot"
+            content={conversationEntry.text}
+            avatar={ConvoAvatar}
+          />
+          <CitationsCard citations={conversationEntry?.search_metadata} />
+        </React.Fragment>
       );
     }
     return null;
