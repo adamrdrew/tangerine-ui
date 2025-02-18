@@ -47,6 +47,9 @@ export const customStyles = (theme: any) => ({
     '& .pf-v6-c-menu-toggle__toggle-icon': {
       '--pf-v6-c-menu-toggle__toggle-icon--Color': '#EE0000',
     },
+    '& .pf-v6-c-menu-toggle.pf-m-secondary.pf-v6-c-menu-toggle': {
+      width: '250px !important',
+    },
   },
   userName: {
     '& .pf-chatbot__hello': {
@@ -78,5 +81,14 @@ export const customStyles = (theme: any) => ({
     '& .pf-chatbot__footnote .pf-v6-c-button__text': {
       color: '#EE0000',
     },
+    '& .pf-v6-c-menu-toggle .pf-m-secondary ': {
+      width: '250px',
+    },
   },
 });
+
+/*
+.pf-chatbot__header .pf-chatbot__actions .pf-v6-c-menu-toggle.pf-m-secondary {
+  width: 250px;
+}
+  */
