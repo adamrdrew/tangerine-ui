@@ -47,6 +47,8 @@ export const Convo = () => {
     useState<boolean>(false);
   const [responseIsStreaming, setResponseIsStreaming] =
     useState<boolean>(false);
+  const [showAgentIntroduction, setShowAgentIntroduction] =
+    useState<boolean>(false);
 
   useEffect(() => {
     const handleLinkClick = event => {
@@ -202,7 +204,16 @@ export const Convo = () => {
     setLoading(false);
     setResponseIsStreaming(false);
     setAgentHasBeenSelected(true);
+    setShowAgentIntroduction(true);
   };
+
+  const handleNewChatClick = (conversation) => {
+    setConversation(conversation);
+    setError(false);
+    setLoading(false);
+    setResponseIsStreaming(false);
+    setShowAgentIntroduction(false);
+  }
 
   return (
     <Page themeId="tool">
@@ -210,7 +221,7 @@ export const Convo = () => {
         <Chatbot displayMode={ChatbotDisplayMode.embedded}>
           <ConvoHeader
             onAgentSelect={agentSelectionHandler}
-            onNewChatClick={setConversation}
+            onNewChatClick={handleNewChatClick}
             agents={agents}
             selectedAgent={selectedAgent}
           />
@@ -227,6 +238,7 @@ export const Convo = () => {
               agent={selectedAgent}
               backendUrl={backendUrl}
               agentHasBeenSelected={agentHasBeenSelected}
+              show={showAgentIntroduction}
             />
             <Conversation conversation={conversation} agent={selectedAgent} />
             <ShowLoadingMessage />

@@ -4,8 +4,15 @@ import { getAgentIntroductionPrompt } from '../../lib/agentIntroductionPrompt';
 import Message from '@patternfly/chatbot/dist/dynamic/Message';
 import ConvoAvatar from '../../../static/robot.svg';
 import { humanizeAgentName } from '../../lib/helpers';
+import { Skeleton } from '@patternfly/react-core';
 
-const AgentIntroductionMessage = ({text, agent}) => {
+const AgentIntroductionMessage = ({ text, agent, loading, show }) => {
+  if (!show) {
+    return null;
+  }
+  if (loading) {
+    return <Skeleton />;
+  }
   return (
     <Message
       key={text}
@@ -15,15 +22,17 @@ const AgentIntroductionMessage = ({text, agent}) => {
       avatar={ConvoAvatar}
     />
   );
-}
+};
 
 export const AgentIntroduction: React.FC<{
   agent: any;
   backendUrl: string;
   agentHasBeenSelected: boolean;
-}> = ({ agent, backendUrl, agentHasBeenSelected }) => {
-  const [llmResponse, setLlmResponse] = React.useState<string>('');
+  show: boolean;
+}> = ({ agent, backendUrl, agentHasBeenSelected, show }) => {
+  const [llmResponse, setLlmResponse] = React.useState<string>('👋');
   const [newToken, setNewToken] = React.useState<string>('');
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const noop = () => {};
 
@@ -35,7 +44,7 @@ export const AgentIntroduction: React.FC<{
     if (!agentHasBeenSelected) {
       return;
     }
-    setLlmResponse('');
+    setLlmResponse('👋');
     handleAgentIntroduction();
   }, [agent]);
 
@@ -52,7 +61,7 @@ export const AgentIntroduction: React.FC<{
         agent.id,
         getAgentIntroductionPrompt(agent.agent_name),
         [],
-        noop,
+        setLoading,
         noop,
         noop,
         noop,
@@ -64,10 +73,11 @@ export const AgentIntroduction: React.FC<{
   };
 
   return (
-    <div>
-      {llmResponse && (
-        <AgentIntroductionMessage text={llmResponse} agent={agent}/>
-      )}
-    </div>
+    <AgentIntroductionMessage
+      text={llmResponse}
+      agent={agent}
+      loading={loading}
+      show={show}
+    />
   );
 };
