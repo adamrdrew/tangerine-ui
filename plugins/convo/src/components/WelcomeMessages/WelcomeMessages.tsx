@@ -35,10 +35,12 @@ export const WelcomeMessages: React.FC<{
     setWelcomePrompts(getWelcomePrompts(sendMessageHandler));
   }, [welcomePrompts]);
 
+  const firstName = profile?.displayName?.split(' ')[0];
+
   if (show && welcomePrompts.length > 0) {
     return (
       <ChatbotWelcomePrompt
-        title={`Hi ${profile?.displayName || 'there'}!`}
+        title={`Hi ${firstName || 'there'}!`}
         description="What would you like to know?"
         prompts={welcomePrompts}
         className={classes.userName}
