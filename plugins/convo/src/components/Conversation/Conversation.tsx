@@ -1,7 +1,7 @@
 import React from 'react';
 import Message from '@patternfly/chatbot/dist/dynamic/Message';
-import ConvoAvatar from '../../../static/avatar.png';
-import UserAvatar from '../../../static/user.png';
+import ConvoAvatar from '../../../static/robot.svg';
+import UserAvatar from '../../../static/user.svg';
 
 import Markdown from 'react-markdown'; // import react-markdown
 
