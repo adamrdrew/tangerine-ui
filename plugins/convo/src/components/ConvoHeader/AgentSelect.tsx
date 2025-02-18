@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ChatbotHeaderSelectorDropdown } from '@patternfly/chatbot/dist/dynamic/ChatbotHeader';
 import { DropdownItem, DropdownList } from '@patternfly/react-core';
+import { humanizeAgentName } from '../../lib/helpers';
 
 export const AgentSelect: React.FC<{
   agents: any[];
@@ -18,12 +19,7 @@ export const AgentSelect: React.FC<{
     return null;
   }
 
-  const humanizeAgentName = (name: string) => {
-    const words = name.split('-');
-    return words
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  }
+
 
   return (
     <div className={className}>

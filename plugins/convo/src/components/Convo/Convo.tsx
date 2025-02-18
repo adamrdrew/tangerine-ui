@@ -12,9 +12,11 @@ import { ConvoFooter } from '../ConvoFooter/ConvoFooter';
 import { ConvoHeader } from '../ConvoHeader/ConvoHeader';
 import { Conversation } from '../Conversation/Conversation';
 import { WelcomeMessages } from '../WelcomeMessages/WelcomeMessages';
+import { AgentIntroduction } from '../AgentIntroduction/AgentIntroduction';
 
 import { customStyles } from '../../lib/styles';
 import { getAgents, sendUserQuery } from '../../lib/api';
+import { getAgentIntroductionPrompt } from '../../lib/agentIntroductionPrompt';
 
 // Style imports needed for the virtual assistant component
 import '@patternfly/react-core/dist/styles/base.css';
@@ -35,30 +37,33 @@ export const Convo = () => {
 
   // State
   const [_userInputMessage, setUserInputMessage] = useState<string>('');
-  const [conversation, setConversation] = useState([]);
+  const [conversation, setConversation] = useState([])
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [agents, setAgents] = useState<any>([]);
   const [selectedAgent, setSelectedAgent] = useState<any>({});
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [agentHasBeenSelected, setAgentHasBeenSelected] =
+    useState<boolean>(false);
   const [responseIsStreaming, setResponseIsStreaming] =
     useState<boolean>(false);
+  const [showAgentIntroduction, setShowAgentIntroduction] =
+    useState<boolean>(false);
 
+  useEffect(() => {
+    const handleLinkClick = event => {
+      const link = event.target.closest('a'); // Matches any <a> element
+      if (link) {
+        event.preventDefault();
+        window.open(link.href, '_blank', 'noopener,noreferrer');
+      }
+    };
 
-    useEffect(() => {
-      const handleLinkClick = (event) => {
-        const link = event.target.closest('a'); // Matches any <a> element
-        if (link) {
-          event.preventDefault();
-          window.open(link.href, '_blank', 'noopener,noreferrer');
-        }
-      };
-    
-      document.addEventListener('click', handleLinkClick);
-      return () => {
-        document.removeEventListener('click', handleLinkClick);
-      };
-    }, []);
+    document.addEventListener('click', handleLinkClick);
+    return () => {
+      document.removeEventListener('click', handleLinkClick);
+    };
+  }, []);
 
   useEffect(() => {
     const currentTheme = theme.palette.type;
@@ -192,13 +197,31 @@ export const Convo = () => {
     return null;
   };
 
+  const agentSelectionHandler = (agent: any) => {
+    setSelectedAgent(agent);
+    setConversation([]);
+    setError(false);
+    setLoading(false);
+    setResponseIsStreaming(false);
+    setAgentHasBeenSelected(true);
+    setShowAgentIntroduction(true);
+  };
+
+  const handleNewChatClick = (conversation:any) => {
+    setConversation(conversation);
+    setError(false);
+    setLoading(false);
+    setResponseIsStreaming(false);
+    setShowAgentIntroduction(false);
+  }
+
   return (
     <Page themeId="tool">
       <Content className={classes.container}>
         <Chatbot displayMode={ChatbotDisplayMode.embedded}>
           <ConvoHeader
-            onAgentSelect={(agent: any) => setSelectedAgent(agent)}
-            onNewChatClick={setConversation}
+            onAgentSelect={agentSelectionHandler}
+            onNewChatClick={handleNewChatClick}
             agents={agents}
             selectedAgent={selectedAgent}
           />
@@ -208,10 +231,16 @@ export const Convo = () => {
             announcement="Type your message and hit enter to send"
           >
             <WelcomeMessages
-              conversation={conversation}
+              show={!agentHasBeenSelected}
               sendMessageHandler={sendMessageHandler}
             />
-            <Conversation conversation={conversation} />
+            <AgentIntroduction
+              agent={selectedAgent}
+              backendUrl={backendUrl}
+              agentHasBeenSelected={agentHasBeenSelected}
+              show={showAgentIntroduction}
+            />
+            <Conversation conversation={conversation} agent={selectedAgent} />
             <ShowLoadingMessage />
             <ShowErrorMessage />
           </MessageBox>

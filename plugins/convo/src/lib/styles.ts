@@ -87,8 +87,4 @@ export const customStyles = (theme: any) => ({
   },
 });
 
-/*
-.pf-chatbot__header .pf-chatbot__actions .pf-v6-c-menu-toggle.pf-m-secondary {
-  width: 250px;
-}
-  */
+
