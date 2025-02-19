@@ -25,6 +25,7 @@ const AgentIntroductionMessage: React.FC<{
       role="bot"
       content={text}
       avatar={ConvoAvatar}
+      timestamp=' '
     />
   );
 };
