@@ -6,13 +6,15 @@ import Chatbot, {
   ChatbotDisplayMode,
 } from '@patternfly/chatbot/dist/dynamic/Chatbot';
 import MessageBox from '@patternfly/chatbot/dist/dynamic/MessageBox';
-import { Skeleton } from '@patternfly/react-core';
+import Message from '@patternfly/chatbot/dist/dynamic/Message';
+import ConvoAvatar from '../../../static/robot.svg';
 
 import { ConvoFooter } from '../ConvoFooter/ConvoFooter';
 import { ConvoHeader } from '../ConvoHeader/ConvoHeader';
 import { Conversation } from '../Conversation/Conversation';
 import { WelcomeMessages } from '../WelcomeMessages/WelcomeMessages';
 import { AgentIntroduction } from '../AgentIntroduction/AgentIntroduction';
+import { humanizeAgentName } from '../../lib/helpers';
 
 import { customStyles } from '../../lib/styles';
 import { getAgents, sendUserQuery } from '../../lib/api';
@@ -36,7 +38,7 @@ export const Convo = () => {
 
   // State
   const [_userInputMessage, setUserInputMessage] = useState<string>('');
-  const [conversation, setConversation] = useState([])
+  const [conversation, setConversation] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [agents, setAgents] = useState<any>([]);
@@ -178,13 +180,6 @@ export const Convo = () => {
     setConversation([...conversation, conversationEntry]);
   };
 
-  const ShowLoadingMessage = () => {
-    if (loading) {
-      return <Skeleton screenreaderText="Loading response" />;
-    }
-    return null;
-  };
-
   const ShowErrorMessage = () => {
     if (error) {
       return (
@@ -206,13 +201,28 @@ export const Convo = () => {
     setShowAgentIntroduction(true);
   };
 
-  const handleNewChatClick = (conversation:any) => {
+  const handleNewChatClick = (conversation: any) => {
     setConversation(conversation);
     setError(false);
     setLoading(false);
     setResponseIsStreaming(false);
     setShowAgentIntroduction(false);
-  }
+  };
+
+  const ShowLoadingMessage = () => {
+    if (loading) {
+      return (
+        <Message
+          name={humanizeAgentName(selectedAgent.agent_name)}
+          role="bot"
+          avatar={ConvoAvatar}
+          timestamp=" "
+          isLoading
+        />
+      );
+    }
+    return null;
+  };
 
   return (
     <Page themeId="tool">
@@ -239,7 +249,10 @@ export const Convo = () => {
               agentHasBeenSelected={agentHasBeenSelected}
               show={showAgentIntroduction}
             />
-            <Conversation conversation={conversation} agent={selectedAgent} />
+            <Conversation
+              conversation={conversation}
+              agent={selectedAgent}
+            />
             <ShowLoadingMessage />
             <ShowErrorMessage />
           </MessageBox>

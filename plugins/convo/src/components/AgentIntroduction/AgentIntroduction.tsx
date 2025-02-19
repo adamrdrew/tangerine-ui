@@ -15,9 +15,6 @@ const AgentIntroductionMessage: React.FC<{
   if (!show) {
     return null;
   }
-  if (loading) {
-    return <Skeleton />;
-  }
   return (
     <Message
       key={text}
@@ -26,6 +23,7 @@ const AgentIntroductionMessage: React.FC<{
       content={text}
       avatar={ConvoAvatar}
       timestamp=' '
+      isLoading={loading}
     />
   );
 };

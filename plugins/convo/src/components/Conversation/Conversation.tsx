@@ -30,6 +30,7 @@ export const Conversation: React.FC<{ conversation: any; agent: any }> = ({
           role="user"
           content={conversationEntry.text}
           avatar={UserAvatar}
+          timestamp=" "
         />
       );
     }
@@ -45,9 +46,8 @@ export const Conversation: React.FC<{ conversation: any; agent: any }> = ({
             role="bot"
             content={conversationEntry.text}
             avatar={ConvoAvatar}
-          >
-            Hello
-          </Message>
+            timestamp=" "
+          />
           <CitationsCard citations={conversationEntry?.search_metadata} />
         </React.Fragment>
       );
