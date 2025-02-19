@@ -36,14 +36,16 @@ export const AgentIntroduction: React.FC<{
   show: boolean;
 }> = ({ agent, backendUrl, agentHasBeenSelected, show }) => {
   const [llmResponse, setLlmResponse] = React.useState<string>('👋');
-  const [newToken, setNewToken] = React.useState<string>('');
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<boolean>(false);
 
   const noop = () => {};
 
   const updateResponse = (text_content: string, _search_metadata: any) => {
-    setNewToken(text_content);
+    if (!text_content) {
+      return;
+    }
+    setLlmResponse(prev => prev + text_content);
   };
 
   React.useEffect(() => {
@@ -54,11 +56,6 @@ export const AgentIntroduction: React.FC<{
     handleAgentIntroduction();
   }, [agent]);
 
-  useEffect(() => {
-    if (newToken) {
-      setLlmResponse(prev => prev + newToken);
-    }
-  }, [newToken]);
 
   const handleAgentIntroduction = async () => {
     setError(false);
