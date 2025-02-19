@@ -22,9 +22,14 @@ export const CitationsCard: React.FC<{ citations: any[] }> = ({
 
   const [currentCitationIndex, setCurrentCitationIndex] = React.useState(0);
   const [isExpanded, setIsExpanded] = React.useState(false);
-
-  const getCurrentTitle = () =>
-    citations[currentCitationIndex]?.metadata?.title || '';
+  const truncate = (text, maxLength = 50) => {
+    if (!text) return '';
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+  };
+  const getCurrentTitle = () => {
+    const title = citations[currentCitationIndex]?.metadata?.title || '';
+    return truncate(title, 45); // Set your limit here
+  };
   const getCurrentBody = () =>
     citations[currentCitationIndex]?.page_content || '';
   const getCurrentLink = () =>
@@ -34,7 +39,9 @@ export const CitationsCard: React.FC<{ citations: any[] }> = ({
     <section
       style={{ marginTop: '-40px', marginBottom: '48px', marginLeft: '4.7em' }}
     >
-      <div className="pf-v6-c-content" style={{marginBottom: "1em"}}><p>{citations?.length} sources</p></div>
+      <div className="pf-v6-c-content" style={{ marginBottom: '1em' }}>
+        <p>{citations?.length} sources</p>
+      </div>
       <Card style={{ maxWidth: '33%' }} isCompact>
         <CardTitle style={{ position: 'relative' }}>
           <Button

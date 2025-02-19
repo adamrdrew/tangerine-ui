@@ -4,14 +4,20 @@ import ConvoAvatar from '../../../static/robot.svg';
 import UserAvatar from '../../../static/user.svg';
 import { humanizeAgentName } from '../../lib/helpers';
 import { CitationsCard } from '../Citations/CitationsCard';
+import { customStyles } from '../../lib/styles';
+import { makeStyles } from '@material-ui/core/styles';
 
 const BOT = 'ai';
 const USER = 'human';
+
+const useStyles = makeStyles(theme => customStyles(theme));
 
 export const Conversation: React.FC<{ conversation: any; agent: any }> = ({
   conversation,
   agent,
 }) => {
+  const classes = useStyles();
+
   const renderUserMessage = (conversationEntry: any, id: number) => {
     if (conversationEntry.hidden) {
       return null;
@@ -39,7 +45,9 @@ export const Conversation: React.FC<{ conversation: any; agent: any }> = ({
             role="bot"
             content={conversationEntry.text}
             avatar={ConvoAvatar}
-          />
+          >
+            Hello
+          </Message>
           <CitationsCard citations={conversationEntry?.search_metadata} />
         </React.Fragment>
       );
@@ -50,8 +58,10 @@ export const Conversation: React.FC<{ conversation: any; agent: any }> = ({
   return conversation.map((conversationEntry: any, index: number) => {
     return (
       <React.Fragment key={index}>
-        {renderUserMessage(conversationEntry, index)}
-        {renderBotMessage(conversationEntry, index)}
+        <div className={classes.messageTextContentFix}>
+          {renderUserMessage(conversationEntry, index)}
+          {renderBotMessage(conversationEntry, index)}
+        </div>
       </React.Fragment>
     );
   });
