@@ -6,7 +6,12 @@ import ConvoAvatar from '../../../static/robot.svg';
 import { humanizeAgentName } from '../../lib/helpers';
 import { Skeleton } from '@patternfly/react-core';
 
-const AgentIntroductionMessage = ({ text, agent, loading, show }) => {
+const AgentIntroductionMessage: React.FC<{
+  text: string;
+  agent: any;
+  loading: boolean;
+  show: boolean;
+}> = ({ text, agent, loading, show }) => {
   if (!show) {
     return null;
   }

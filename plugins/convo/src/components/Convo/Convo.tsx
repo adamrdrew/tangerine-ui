@@ -16,7 +16,6 @@ import { AgentIntroduction } from '../AgentIntroduction/AgentIntroduction';
 
 import { customStyles } from '../../lib/styles';
 import { getAgents, sendUserQuery } from '../../lib/api';
-import { getAgentIntroductionPrompt } from '../../lib/agentIntroductionPrompt';
 
 // Style imports needed for the virtual assistant component
 import '@patternfly/react-core/dist/styles/base.css';

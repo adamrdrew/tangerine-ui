@@ -85,6 +85,22 @@ export const customStyles = (theme: any) => ({
       width: '250px',
     },
   },
+  messageTextContentFix: {
+    '& .pf-chatbot__message-response': {
+      // Treat the whole response as a content block
+      '& p, & a, & ol, & ul, & li': {
+        fontSize: 'var(--pf-v6-global--FontSize--md)',
+        lineHeight: 'var(--pf-v6-global--LineHeight--md)',
+        color: 'var(--pf-v6-global--Color--100)',
+        marginBottom: 'var(--pf-v6-global--spacer--md)',
+      },
+      '& a': {
+        color: 'var(--pf-v6-global--link--Color)',
+        textDecoration: 'underline',
+      },
+      '& ol, & ul': {
+        paddingLeft: 'var(--pf-v6-global--spacer--md)',
+      },
+    },
+  },
 });
-
-
