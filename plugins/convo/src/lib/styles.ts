@@ -38,6 +38,9 @@ export const customStyles = (theme: any) => ({
   redHatRedBGColor: {
     backgroundColor: `#EE0000 !important`,
   },
+  redHatGrayBGColor: {
+    backgroundColor: `#EDEDED !important`,
+  },
   agentMenu: {
     '& .pf-v6-c-menu-toggle': {
       '--pf-v6-c-menu-toggle--Color': '#EE0000',

@@ -38,8 +38,8 @@ export const ConvoHeader: React.FC<{
       </ChatbotHeaderMain>
       <ChatbotHeaderActions>
         <Button
-          className={classes.redHatRedBGColor}
-          disabled={loading}
+          className={loading ?  classes.redHatGrayBGColor : classes.redHatRedBGColor}
+          isDisabled={loading}
           onClick={() => {
             onNewChatClick([]);
           }}
