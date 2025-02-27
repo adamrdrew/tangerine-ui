@@ -150,25 +150,38 @@ export const Convo = () => {
         return prevMessages;
       }
 
+      // If the last message is from the user we need to create a new bot message
+      // and we put the text content in the message.
+      // In a streaming response this handles the first returned chunk
       if (lastMessage.sender !== BOT) {
         const newMessage = {
           sender: BOT,
           text: text_content,
           done: false,
+          //We wont know the interaction ID until we get the last chunk
+          interactionId: "",
         };
         return [...prevMessages, newMessage];
       }
 
+      //If we haven't tripped the above conditional we are in a streaming response
+      // and we need to update the last message with the new text content
       const updatedMessages = [...prevMessages];
 
+      // If we have text content we need to update the last message
       if (text_content) {
         updatedMessages[updatedMessages.length - 1].text += text_content;
       }
 
+      // If we have search metadata we need to update the last message
+      // and set the done flag to true
       if (search_metadata) {
         updatedMessages[updatedMessages.length - 1].search_metadata =
           search_metadata;
         updatedMessages[updatedMessages.length - 1].done = true;
+        updatedMessages[updatedMessages.length - 1].interactionId =
+          search_metadata[0].interactionId;
+
       }
 
       return updatedMessages;
