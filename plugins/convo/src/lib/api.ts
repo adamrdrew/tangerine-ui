@@ -1,3 +1,5 @@
+const CLIENT = 'convo';
+
 // Public functions
 export const getAgents = (
   backendUrl: string,
@@ -46,6 +48,7 @@ export const sendUserQuery = async (
   setResponseIsStreaming: (streaming: boolean) => void,
   handleError: (error: Error) => void,
   updateConversation: (text_content: string, search_metadata: any) => void,
+  sessionId: string,
 ) => {
   try {
     setLoading(true);
@@ -59,6 +62,7 @@ export const sendUserQuery = async (
       userQuery,
       backendUrl,
       previousMessages,
+      sessionId,
     );
     const reader = createStreamReader(response);
 
@@ -79,6 +83,7 @@ const sendQueryToServer = async (
   userQuery: any,
   backendUrl: string,
   previousMessages: string,
+  sessionId: string,
 ) => {
   try {
     const response = await fetch(
@@ -90,6 +95,9 @@ const sendQueryToServer = async (
           query: userQuery,
           stream: 'true',
           prevMsgs: previousMessages,
+          client: CLIENT,
+          interactionId: crypto.randomUUID(),
+          sessionId: sessionId,
         }),
         cache: 'no-cache',
       },

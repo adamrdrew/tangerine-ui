@@ -50,6 +50,7 @@ export const Convo = () => {
     useState<boolean>(false);
   const [showAgentIntroduction, setShowAgentIntroduction] =
     useState<boolean>(false);
+  const [sessionId, setSessionId] = useState<string>(crypto.randomUUID());
 
   useEffect(() => {
     const handleLinkClick = event => {
@@ -115,6 +116,7 @@ export const Convo = () => {
         setResponseIsStreaming,
         handleError,
         updateConversation,
+        sessionId,
       );
     }
   }, [conversation]);
@@ -207,6 +209,7 @@ export const Convo = () => {
     setLoading(false);
     setResponseIsStreaming(false);
     setShowAgentIntroduction(false);
+    setSessionId(crypto.randomUUID());
   };
 
   const ShowLoadingMessage = () => {
@@ -233,6 +236,7 @@ export const Convo = () => {
             onNewChatClick={handleNewChatClick}
             agents={agents}
             selectedAgent={selectedAgent}
+            loading={loading}
           />
           <MessageBox
             className={`${classes.messagebox} ${classes.userMessageText} `}

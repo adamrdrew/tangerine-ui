@@ -20,7 +20,8 @@ export const ConvoHeader: React.FC<{
   onNewChatClick: ([]: any) => void;
   agents: any[];
   selectedAgent: any;
-}> = ({ onAgentSelect, onNewChatClick, agents, selectedAgent }) => {
+  loading: boolean;
+}> = ({ onAgentSelect, onNewChatClick, agents, selectedAgent, loading }) => {
   // CSS Overrides to make PF components look normal in Backstage
   const theme = useTheme();
   const useStyles = makeStyles(_theme => customStyles(theme));
@@ -38,6 +39,7 @@ export const ConvoHeader: React.FC<{
       <ChatbotHeaderActions>
         <Button
           className={classes.redHatRedBGColor}
+          disabled={loading}
           onClick={() => {
             onNewChatClick([]);
           }}
