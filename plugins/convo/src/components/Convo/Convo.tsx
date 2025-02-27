@@ -159,7 +159,7 @@ export const Convo = () => {
           text: text_content,
           done: false,
           //We wont know the interaction ID until we get the last chunk
-          interactionId: "",
+          interactionId: false,
         };
         return [...prevMessages, newMessage];
       }

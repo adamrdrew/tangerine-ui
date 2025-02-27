@@ -6,7 +6,7 @@ import { humanizeAgentName } from '../../lib/helpers';
 import { CitationsCard } from '../Citations/CitationsCard';
 import { customStyles } from '../../lib/styles';
 import { makeStyles } from '@material-ui/core/styles';
-
+import { Feedback } from '../Feedback/Feedback';
 const BOT = 'ai';
 const USER = 'human';
 
@@ -48,6 +48,7 @@ export const Conversation: React.FC<{ conversation: any; agent: any }> = ({
             avatar={ConvoAvatar}
             timestamp=" "
           />
+          <Feedback interactionId={conversationEntry.interactionId} />
           <CitationsCard citations={conversationEntry?.search_metadata} />
         </React.Fragment>
       );

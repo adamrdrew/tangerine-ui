@@ -1,6 +1,43 @@
 const CLIENT = 'convo';
 
 // Public functions
+
+export const sendFeedback = (
+  backendUrl: string,
+  feedbackOpts: {
+    interactionId: string;
+    feedback: string;
+    like: boolean;
+    dislike: boolean;
+  },
+  callback: (response: any) => void,
+) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(feedbackOpts),
+  };
+  fetch(`${backendUrl}/api/proxy/tangerine/api/feedback`, requestOptions)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(
+          `Server responded with ${response.status}: ${response.statusText}`,
+        );
+      }
+      return response.json();
+    })
+    .then(response => {
+      if (response.error) {
+        throw new Error(`Error: ${response.error}`);
+      }
+      callback(response);
+    })
+    .catch(error => {
+      console.error(`Error sending feedback: ${error.message}`);
+      callback({ error: true });
+    });
+};
+
 export const getAgents = (
   backendUrl: string,
   setAgents: (data: any) => void,
@@ -47,10 +84,7 @@ export const sendUserQuery = async (
   setError: (error: boolean) => void,
   setResponseIsStreaming: (streaming: boolean) => void,
   handleError: (error: Error) => void,
-  updateConversation: (
-    text_content: string,
-    search_metadata: any,
-  ) => void,
+  updateConversation: (text_content: string, search_metadata: any) => void,
   sessionId: string,
   abortSignal: AbortSignal,
 ) => {
@@ -135,10 +169,7 @@ const createStreamReader = (response: Response) => {
 
 const processChunk = (
   value: string,
-  updateConversation: (
-    text_content: string,
-    search_metadata: any,
-  ) => void,
+  updateConversation: (text_content: string, search_metadata: any) => void,
 ) => {
   try {
     const matches = [...value.matchAll(/data: (\{.*\})\r\n/g)];
