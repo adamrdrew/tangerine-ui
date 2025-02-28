@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { sendUserQuery } from '../../lib/api';
 import { getAgentIntroductionPrompt } from '../../lib/agentIntroductionPrompt';
 import Message from '@patternfly/chatbot/dist/dynamic/Message';
 import ConvoAvatar from '../../../static/robot.svg';
 import { humanizeAgentName } from '../../lib/helpers';
-import { Skeleton } from '@patternfly/react-core';
 
 const AgentIntroductionMessage: React.FC<{
   text: string;
@@ -33,10 +32,13 @@ export const AgentIntroduction: React.FC<{
   backendUrl: string;
   agentHasBeenSelected: boolean;
   show: boolean;
-}> = ({ agent, backendUrl, agentHasBeenSelected, show }) => {
+  sessionId: string;
+  abortControllerRef: React.MutableRefObject<AbortController>;
+}> = ({ agent, backendUrl, agentHasBeenSelected, show, sessionId, abortControllerRef }) => {
   const [llmResponse, setLlmResponse] = React.useState<string>('👋');
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<boolean>(false);
+  
 
   const noop = () => {};
 
@@ -69,6 +71,8 @@ export const AgentIntroduction: React.FC<{
         noop,
         noop,
         updateResponse,
+        sessionId,
+        abortControllerRef.current.signal
       );
     } catch (error) {
       console.error('Error fetching agent introduction:', error);

@@ -286,6 +286,8 @@ export const Convo = () => {
               backendUrl={backendUrl}
               agentHasBeenSelected={agentHasBeenSelected}
               show={showAgentIntroduction}
+              sessionId={sessionId}
+              abortControllerRef={abortControllerRef}
             />
             <Conversation conversation={conversation} agent={selectedAgent} />
             <ShowLoadingMessage />
