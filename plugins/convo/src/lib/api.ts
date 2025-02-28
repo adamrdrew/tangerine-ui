@@ -1,4 +1,43 @@
+const CLIENT = 'convo';
+
 // Public functions
+
+export const sendFeedback = (
+  backendUrl: string,
+  feedbackOpts: {
+    interactionId: string;
+    feedback: string;
+    like: boolean;
+    dislike: boolean;
+  },
+  callback: (response: any) => void,
+) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(feedbackOpts),
+  };
+  fetch(`${backendUrl}/api/proxy/tangerine/api/feedback`, requestOptions)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(
+          `Server responded with ${response.status}: ${response.statusText}`,
+        );
+      }
+      return response.json();
+    })
+    .then(response => {
+      if (response.error) {
+        throw new Error(`Error: ${response.error}`);
+      }
+      callback(response);
+    })
+    .catch(error => {
+      console.error(`Error sending feedback: ${error.message}`);
+      callback({ error: true });
+    });
+};
+
 export const getAgents = (
   backendUrl: string,
   setAgents: (data: any) => void,
@@ -15,7 +54,7 @@ export const getAgents = (
     .then(response => response.json())
     .then(response => {
       setAgents(
-        response.data.sort((a, b) => a.agent_name.localeCompare(b.agent_name))
+        response.data.sort((a, b) => a.agent_name.localeCompare(b.agent_name)),
       );
       // HACK: Look for an agent named "'inscope-all-docs-agent'" and select it by default
       // if it isn't there just use the first agent
@@ -46,6 +85,8 @@ export const sendUserQuery = async (
   setResponseIsStreaming: (streaming: boolean) => void,
   handleError: (error: Error) => void,
   updateConversation: (text_content: string, search_metadata: any) => void,
+  sessionId: string,
+  abortSignal: AbortSignal,
 ) => {
   try {
     setLoading(true);
@@ -59,6 +100,8 @@ export const sendUserQuery = async (
       userQuery,
       backendUrl,
       previousMessages,
+      sessionId,
+      abortSignal,
     );
     const reader = createStreamReader(response);
 
@@ -67,6 +110,7 @@ export const sendUserQuery = async (
       setLoading,
       setResponseIsStreaming,
       updateConversation,
+      abortSignal,
     );
   } catch (error: any) {
     handleError(error);
@@ -79,6 +123,8 @@ const sendQueryToServer = async (
   userQuery: any,
   backendUrl: string,
   previousMessages: string,
+  sessionId: string,
+  abortSignal: AbortSignal,
 ) => {
   try {
     const response = await fetch(
@@ -90,8 +136,12 @@ const sendQueryToServer = async (
           query: userQuery,
           stream: 'true',
           prevMsgs: previousMessages,
+          client: CLIENT,
+          interactionId: crypto.randomUUID(),
+          sessionId: sessionId,
         }),
         cache: 'no-cache',
+        signal: abortSignal,
       },
     );
 
@@ -140,15 +190,25 @@ const processStream = async (
   reader: ReadableStreamDefaultReader,
   setLoading: (loading: boolean) => void,
   setResponseIsStreaming: (streaming: boolean) => void,
-  updateConversation: (text_content: string, search_metadata: any) => void,
+  updateConversation: (
+    text_content: string,
+    search_metadata: any,
+    sessionId: string,
+  ) => void,
+  abortSignal: AbortSignal,
 ) => {
   setLoading(false);
   setResponseIsStreaming(true);
   try {
     while (true) {
+      if (abortSignal.aborted) {
+        console.log('Stream processing aborted.');
+        setLoading(false);
+        setResponseIsStreaming(false);
+        return;
+      }
       const chunk = await reader.read();
       const { done, value } = chunk;
-
       processChunk(value, updateConversation);
 
       if (done) {

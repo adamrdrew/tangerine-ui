@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useApi, configApiRef } from '@backstage/core-plugin-api';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Content, Page } from '@backstage/core-components';
@@ -50,6 +50,8 @@ export const Convo = () => {
     useState<boolean>(false);
   const [showAgentIntroduction, setShowAgentIntroduction] =
     useState<boolean>(false);
+  const [sessionId, setSessionId] = useState<string>(crypto.randomUUID());
+  const abortControllerRef = useRef(new AbortController());
 
   useEffect(() => {
     const handleLinkClick = event => {
@@ -105,17 +107,23 @@ export const Convo = () => {
     ) {
       const lastMessage = conversation[conversation.length - 1];
       const previousMessages = conversation.slice(0, conversation.length - 1);
-      sendUserQuery(
-        backendUrl,
-        selectedAgent.id,
-        lastMessage.text,
-        previousMessages,
-        setLoading,
-        setError,
-        setResponseIsStreaming,
-        handleError,
-        updateConversation,
-      );
+      try {
+        sendUserQuery(
+          backendUrl,
+          selectedAgent.id,
+          lastMessage.text,
+          previousMessages,
+          setLoading,
+          setError,
+          setResponseIsStreaming,
+          handleError,
+          updateConversation,
+          sessionId,
+          abortControllerRef.current.signal,
+        );
+      } catch (error) {
+        console.log('Error sending user query:', error);
+      }
     }
   }, [conversation]);
 
@@ -132,35 +140,53 @@ export const Convo = () => {
     if (messageBox) {
       messageBox.scrollTo({ top: messageBox.scrollHeight, behavior: 'smooth' });
     }
-  }, [conversation.length]); // Assuming messages is your chat log
+  }, [conversation.length]);
 
   const updateConversation = (text_content: string, search_metadata: any) => {
+
     setConversation(prevMessages => {
       const lastMessage = prevMessages[prevMessages.length - 1];
+      if (!lastMessage) {
+        return prevMessages;
+      }
 
+      // If the last message is from the user we need to create a new bot message
+      // and we put the text content in the message.
+      // In a streaming response this handles the first returned chunk
       if (lastMessage.sender !== BOT) {
         const newMessage = {
           sender: BOT,
           text: text_content,
           done: false,
+          //We wont know the interaction ID until we get the last chunk
+          interactionId: false,
         };
         return [...prevMessages, newMessage];
       }
 
+      //If we haven't tripped the above conditional we are in a streaming response
+      // and we need to update the last message with the new text content
       const updatedMessages = [...prevMessages];
 
+      // If we have text content we need to update the last message
       if (text_content) {
         updatedMessages[updatedMessages.length - 1].text += text_content;
       }
 
+      // If we have search metadata we need to update the last message
+      // and set the done flag to true
       if (search_metadata) {
         updatedMessages[updatedMessages.length - 1].search_metadata =
           search_metadata;
         updatedMessages[updatedMessages.length - 1].done = true;
+        updatedMessages[updatedMessages.length - 1].interactionId =
+          search_metadata[0].interactionId;
+
       }
 
       return updatedMessages;
     });
+    return true;
   };
 
   const handleError = (error: Error) => {
@@ -191,7 +217,15 @@ export const Convo = () => {
     return null;
   };
 
+  const recycleAbortController = () => {
+    // Abort previous request
+    abortControllerRef.current.abort();
+    // Create a new abort controller for the new session
+    abortControllerRef.current = new AbortController();
+  };
+
   const agentSelectionHandler = (agent: any) => {
+    recycleAbortController();
     setSelectedAgent(agent);
     setConversation([]);
     setError(false);
@@ -199,14 +233,17 @@ export const Convo = () => {
     setResponseIsStreaming(false);
     setAgentHasBeenSelected(true);
     setShowAgentIntroduction(true);
+    setSessionId(crypto.randomUUID());
   };
 
   const handleNewChatClick = (conversation: any) => {
+    recycleAbortController();
     setConversation(conversation);
     setError(false);
     setLoading(false);
     setResponseIsStreaming(false);
     setShowAgentIntroduction(false);
+    setSessionId(crypto.randomUUID());
   };
 
   const ShowLoadingMessage = () => {
@@ -233,6 +270,7 @@ export const Convo = () => {
             onNewChatClick={handleNewChatClick}
             agents={agents}
             selectedAgent={selectedAgent}
+            loading={loading}
           />
           <MessageBox
             className={`${classes.messagebox} ${classes.userMessageText} `}
@@ -249,10 +287,7 @@ export const Convo = () => {
               agentHasBeenSelected={agentHasBeenSelected}
               show={showAgentIntroduction}
             />
-            <Conversation
-              conversation={conversation}
-              agent={selectedAgent}
-            />
+            <Conversation conversation={conversation} agent={selectedAgent} />
             <ShowLoadingMessage />
             <ShowErrorMessage />
           </MessageBox>
