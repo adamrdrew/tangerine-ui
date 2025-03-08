@@ -29,7 +29,7 @@ export const WelcomeMessages: React.FC<{
       return {
         title: prompt.title,
         message: prompt.prompt,
-        onClick: () => sendMessageHandler(prompt.message),
+        onClick: () => sendMessageHandler(prompt.prompt),
       };
     });
   }
