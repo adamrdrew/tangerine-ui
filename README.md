@@ -4,7 +4,7 @@ This is a frontend plugin that provides a conversational AI search interface tha
 
 ## Development
 Before starting:
-* Make sure you are using Node 18
+* Make sure you are using Node 20.17 or higher
 * Run `yarn install`
 * You'll need the URL for your tangerine server as well as the OAuth token exported as environment variables:
 
