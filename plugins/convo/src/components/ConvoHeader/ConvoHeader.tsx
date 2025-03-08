@@ -1,5 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import { useApi, configApiRef } from '@backstage/core-plugin-api';
 
 import {
   ChatbotHeader,
@@ -24,21 +25,26 @@ export const ConvoHeader: React.FC<{
 }> = ({ onAgentSelect, onNewChatClick, agents, selectedAgent, loading }) => {
   // CSS Overrides to make PF components look normal in Backstage
   const theme = useTheme();
-  const useStyles = makeStyles(_theme => customStyles(theme));
+  const config = useApi(configApiRef);
+  const highlightColor =
+    config.getString('convoFrontend.highlightColor')
+    const title = config.getString('convoFrontend.title');
+  const useStyles = makeStyles(_theme => customStyles(theme, highlightColor));
   const classes = useStyles();
-
   return (
     <ChatbotHeader className={classes.header}>
       <ChatbotHeaderMain>
-        <ChatbotHeaderTitle className={classes.headerTitle} >
+        <ChatbotHeaderTitle className={classes.headerTitle}>
           <Title headingLevel="h1" size="3xl">
-            Convo
+            {title}
           </Title>
         </ChatbotHeaderTitle>
       </ChatbotHeaderMain>
       <ChatbotHeaderActions>
         <Button
-          className={loading ?  classes.redHatGrayBGColor : classes.redHatRedBGColor}
+          className={
+            loading ? classes.redHatGrayBGColor : classes.redHatRedBGColor
+          }
           isDisabled={loading}
           onClick={() => {
             onNewChatClick([]);

@@ -22,6 +22,7 @@
     "@backstage/integration-react": "^1.2.3",
     "@backstage/theme": "^0.6.3",
     "@internal/backstage-plugin-assistant-admin": "^0.1.0",
+    "@redhatinsights/backstage-plugin-convo-frontend": "^1.0.7",
     "@material-ui/core": "^4.12.2",
     "@material-ui/icons": "^4.9.1",
     "history": "^5.0.0",
@@ -55,6 +56,7 @@
     ]
   },
   "files": [
-    "dist"
+    "dist",
+    "config.d.ts"
   ]
 }

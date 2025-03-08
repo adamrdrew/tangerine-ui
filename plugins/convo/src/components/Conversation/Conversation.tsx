@@ -7,15 +7,18 @@ import { CitationsCard } from '../Citations/CitationsCard';
 import { customStyles } from '../../lib/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import { Feedback } from '../Feedback/Feedback';
+import { useApi, configApiRef } from '@backstage/core-plugin-api';
 const BOT = 'ai';
 const USER = 'human';
 
-const useStyles = makeStyles(theme => customStyles(theme));
 
 export const Conversation: React.FC<{ conversation: any; agent: any }> = ({
   conversation,
   agent,
 }) => {
+  const config = useApi(configApiRef);
+  const highlightColor = config.getString('convoFrontend.highlightColor');
+  const useStyles = makeStyles(theme => customStyles(theme, highlightColor));
   const classes = useStyles();
 
   const renderUserMessage = (conversationEntry: any, id: number) => {

@@ -1,11 +1,23 @@
 app:
-  title: Tangerine UI
+  title: Tangerine
   baseUrl: http://localhost:3000
 
 organization:
-  name: My Company
+  name: The Tangerine Project
 
 dangerouslyAllowUnverifiedAuth: true
+
+convoFrontend:
+  title: "Tangerine"
+  highlightColor: "#F28500"
+  safetyMessage:
+    title: "Be Mindful"
+    content: "Tangerine is a LLM backed RAG tool. It may get things wrong. Verify before you trust."
+  welcomePrompts:
+    - title: "Get to know Tangerine"
+      prompt: "What topics do I know about?"
+    - title: "Ask how to ask"
+      prompt: "What are some good questions to ask?"
 
 backend:
   baseUrl: http://localhost:7007
@@ -17,6 +29,10 @@ backend:
     origin: http://localhost:3000
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
+  database:
+    type: sqlite
+    client: better-sqlite3
+    connection: ':memory:'
 
 proxy:
   endpoints:

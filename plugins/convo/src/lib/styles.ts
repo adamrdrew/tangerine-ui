@@ -1,4 +1,8 @@
-export const customStyles = (theme: any) => ({
+
+
+
+
+export const customStyles = (theme: any, highlightColor: string) => ({
   prompt: {
     'justify-content': 'flex-end',
   },
@@ -13,7 +17,7 @@ export const customStyles = (theme: any) => ({
   userMessageText: {
     '& .pf-chatbot__message--user': {
       '& .pf-chatbot__message-text': {
-        backgroundColor: '#EE0000 !important',
+        backgroundColor: `${highlightColor} !important`,
         '& p': {
           color: theme.palette.common.white,
         },
@@ -33,22 +37,22 @@ export const customStyles = (theme: any) => ({
     justifyContent: 'left !important',
   },
   redHatRedFGColor: {
-    color: `#EE0000 !important`,
+    color: `${highlightColor} !important`,
   },
   redHatRedBGColor: {
-    backgroundColor: `#EE0000 !important`,
+    backgroundColor: `${highlightColor} !important`,
   },
   redHatGrayBGColor: {
     backgroundColor: `#EDEDED !important`,
   },
   agentMenu: {
     '& .pf-v6-c-menu-toggle': {
-      '--pf-v6-c-menu-toggle--Color': '#EE0000',
-      '--pf-v6-c-menu-toggle--BorderColor': '#EE0000',
-      '--pf-v6-c-menu-toggle--m-secondary--BorderColor': '#EE0000',
+      '--pf-v6-c-menu-toggle--Color': highlightColor,
+      '--pf-v6-c-menu-toggle--BorderColor': highlightColor,
+      '--pf-v6-c-menu-toggle--m-secondary--BorderColor': highlightColor,
     },
     '& .pf-v6-c-menu-toggle__toggle-icon': {
-      '--pf-v6-c-menu-toggle__toggle-icon--Color': '#EE0000',
+      '--pf-v6-c-menu-toggle__toggle-icon--Color': highlightColor,
     },
     '& .pf-v6-c-menu-toggle.pf-m-secondary.pf-v6-c-menu-toggle': {
       width: '250px !important',
@@ -56,12 +60,12 @@ export const customStyles = (theme: any) => ({
   },
   userName: {
     '& .pf-chatbot__hello': {
-      color: '#EE0000',
+      color: highlightColor,
     },
   },
   userInput: {
     '& .pf-chatbot__message-bar:focus-within': {
-      boxShadow: 'inset 0 0 0 1px #EE0000 !important',
+      boxShadow: `inset 0 0 0 1px ${highlightColor} !important`,
     },
   },
   footerText: {
@@ -82,7 +86,7 @@ export const customStyles = (theme: any) => ({
       alignItems: 'center',
     },
     '& .pf-chatbot__footnote .pf-v6-c-button__text': {
-      color: '#EE0000',
+      color: highlightColor,
     },
     '& .pf-v6-c-menu-toggle .pf-m-secondary ': {
       width: '250px',

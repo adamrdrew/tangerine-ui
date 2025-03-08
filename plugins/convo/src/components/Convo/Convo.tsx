@@ -23,16 +23,16 @@ import { getAgents, sendUserQuery } from '../../lib/api';
 import '@patternfly/react-core/dist/styles/base.css';
 import '@patternfly/chatbot/dist/css/main.css';
 
-// CSS Overrides to make PF components look normal in Backstage
-const useStyles = makeStyles(theme => customStyles(theme));
-
 const BOT = 'ai';
 const USER = 'human';
 
 export const Convo = () => {
+  const config = useApi(configApiRef);
+  const highlightColor = config.getString('convoFrontend.highlightColor');
+  // CSS Overrides to make PF components look normal in Backstage
+  const useStyles = makeStyles(theme => customStyles(theme, highlightColor));
   // Constants
   const classes = useStyles();
-  const config = useApi(configApiRef);
   const backendUrl = config.getString('backend.baseUrl');
   const theme = useTheme();
 
@@ -143,7 +143,6 @@ export const Convo = () => {
   }, [conversation.length]);
 
   const updateConversation = (text_content: string, search_metadata: any) => {
-
     setConversation(prevMessages => {
       const lastMessage = prevMessages[prevMessages.length - 1];
       if (!lastMessage) {
@@ -181,7 +180,6 @@ export const Convo = () => {
         updatedMessages[updatedMessages.length - 1].done = true;
         updatedMessages[updatedMessages.length - 1].interactionId =
           search_metadata[0].interactionId;
-
       }
 
       return updatedMessages;

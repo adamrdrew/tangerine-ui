@@ -36,7 +36,6 @@ const useSidebarLogoStyles = makeStyles({
 const SidebarLogo = () => {
   const classes = useSidebarLogoStyles();
   const { isOpen } = useSidebarOpenState();
-
   return (
     <div className={classes.root}>
       <Link to="/" underline="none" className={classes.link} aria-label="Home">
@@ -51,7 +50,6 @@ export const Root = ({ children }: PropsWithChildren<{}>) => (
     <Sidebar>
       <SidebarLogo />
 
-      <SidebarDivider />
       <SidebarGroup label="Menu" icon={<MenuIcon />}>
         <SidebarItem icon={ChatBubble} to="convo" text="Chat" />
         <SidebarDivider />

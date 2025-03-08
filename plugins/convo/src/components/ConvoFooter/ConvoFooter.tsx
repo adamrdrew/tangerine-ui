@@ -4,6 +4,7 @@ import { ChatbotFooter } from '@patternfly/chatbot/dist/dynamic/ChatbotFooter';
 import { ChatbotFootnote } from '@patternfly/chatbot/dist/dynamic/ChatbotFooter';
 import { makeStyles, useTheme } from '@material-ui/core';
 import { customStyles } from '../../lib/styles';
+import { configApiRef, useApi } from '@backstage/core-plugin-api';
 
 export const ConvoFooter: React.FC<{
   sendMessageHandler: (msg: string) => void;
@@ -11,7 +12,12 @@ export const ConvoFooter: React.FC<{
 }> = ({ sendMessageHandler, responseIsStreaming }) => {
   // CSS Overrides to make PF components look normal in Backstage
   const theme = useTheme();
-  const useStyles = makeStyles(_theme => customStyles(theme));
+  const config = useApi(configApiRef);
+  const title = config.getString('convoFrontend.title');
+  const safetyTitle = config.getString('convoFrontend.safetyMessage.title');
+  const safetyContent = config.getString('convoFrontend.safetyMessage.content');
+  const highlightColor = config.getString('convoFrontend.highlightColor');
+  const useStyles = makeStyles(_theme => customStyles(theme, highlightColor));
   const classes = useStyles();
   return (
     <ChatbotFooter>
@@ -25,18 +31,10 @@ export const ConvoFooter: React.FC<{
       </div>
       <div className={classes.footerText}>
         <ChatbotFootnote
-          label="Convo uses AI. Check for mistakes."
+          label={`${title} uses AI. Check for mistakes.`}
           popover={{
-            title: 'Verify accuracy',
-            description: `You are about to use a Red Hat AI-powered conversational search
-    engine, which utilizes generative AI technology to provide you
-    with relevant information. Please do not include any personal
-    information in your queries. By proceeding to use the tool, you
-    acknowledge that the tool and any output provided are only
-    intended for internal use and that information should only be
-    shared with those with a legitimate business purpose. Responses
-    provided by tools utilizing GAI technology should be reviewed and
-    verified prior to use.`,
+            title: safetyTitle,
+            description: safetyContent,
           }}
         />
       </div>
