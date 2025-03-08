@@ -1,6 +1,7 @@
 import React, { PropsWithChildren } from 'react';
 import { makeStyles } from '@material-ui/core';
 import ChatBubble from '@material-ui/icons/ChatBubble';
+import { Settings } from '@material-ui/icons';
 import LogoFull from './LogoFull';
 import LogoIcon from './LogoIcon';
 import {
@@ -53,10 +54,15 @@ export const Root = ({ children }: PropsWithChildren<{}>) => (
       <SidebarDivider />
       <SidebarGroup label="Menu" icon={<MenuIcon />}>
         <SidebarItem icon={ChatBubble} to="convo" text="Chat" />
-        
         <SidebarDivider />
-        <SidebarScrollWrapper>
-        </SidebarScrollWrapper>
+        <SidebarItem
+          icon={Settings}
+          to="assistant-admin"
+          text="Assistant Admin"
+        />
+
+        <SidebarDivider />
+        <SidebarScrollWrapper></SidebarScrollWrapper>
       </SidebarGroup>
       <SidebarSpace />
       <SidebarDivider />
