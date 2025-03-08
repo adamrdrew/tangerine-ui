@@ -1,5 +1,4 @@
-# Convo AI Search Assistant Plugin
-
+# 🍊 Tangerine
 This is a frontend plugin that provides a conversational AI search interface that talks to [Tangerine](https://github.com/RedHatInsights/tangerine-backend).
 
 ## Development
