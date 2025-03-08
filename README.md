@@ -60,3 +60,8 @@ Add this to the dynmaic plugins config file
 
 Run `./build` - the packed tarball for the release along with its integrity sha will be generated.
 
+# Attributions
+
+This project uses graphics from Twemoji, licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).
+Twemoji graphics © 2014-2024 Twitter, Inc and other contributors.
+The original source can be found here: https://github.com/twitter/twemoji.
