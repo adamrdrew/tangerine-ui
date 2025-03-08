@@ -24,7 +24,7 @@ backend:
 proxy:
   endpoints:
     '/tangerine':
-      target: localhost:5000
+      target: http://localhost:5000
       allowedMethods: ['POST', 'GET']
       credentials: dangerously-allow-unauthenticated
 
