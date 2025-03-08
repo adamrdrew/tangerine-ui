@@ -33,10 +33,12 @@
     "@material-ui/lab": "4.0.0-alpha.61",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
+    "@patternfly/chatbot": "2.1.0",
     "@patternfly/patternfly": "^6",
     "@patternfly/react-core": "^6",
     "@patternfly/react-styles": "^6",
-    "@patternfly/chatbot": "2.1.0",
+    "dompurify": "^3.2.4",
+    "markdown-to-jsx": "^7.7.4",
     "mui-markdown": "^1.2.1",
     "react-markdown": "^9.0.1",
     "react-use": "^17.2.4"

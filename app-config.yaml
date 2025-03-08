@@ -17,9 +17,6 @@ backend:
     origin: http://localhost:3000
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
-  database:
-    client: better-sqlite3
-    connection: ':memory:'
 
 proxy:
   endpoints:
@@ -28,9 +25,3 @@ proxy:
       allowedMethods: ['POST', 'GET']
       credentials: dangerously-allow-unauthenticated
 
-
-auth:
-  # see https://backstage.io/docs/auth/ to learn about auth providers
-  providers:
-    # See https://backstage.io/docs/auth/guest/provider
-    guest: {}
